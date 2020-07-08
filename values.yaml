@@ -7,6 +7,8 @@ replicaCountPassive: 2
 
 data:
   scratch_root: "/net/cdcicn02/scratch/shared/savchenk/data/dispatcher-scratches//staging-on-staging-1-3"
+  reduced:
+    ddcache: "/net/cdcicn02/scratch/shared/savchenk/data/reduced/ddcache"
 
 image:
   repository: odahub/dispatcher
