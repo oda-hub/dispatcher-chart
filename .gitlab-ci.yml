@@ -1,0 +1,34 @@
+stages:
+  - build
+  - deploy
+
+
+docker-build:
+  # Official docker image.
+  image: docker:stable
+  stage: build
+  before_script:
+    - apk add git openssh make bash
+    - git clone https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.astro.unige.ch/cdci/dispatcher/cdci_docker_dispatcher
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
+    - docker info
+  script:
+    - make push -C cdci_docker_dispatcher
+  only:
+    - staging-1-3
+    - ci
+
+
+deploy:
+  image: alpine/helm
+  stage: deploy
+  dependencies: build
+  before_script:
+    - apk add git openssh make bash
+  script:
+    - helm list -A
+    - export NAMESPACE=$CI_DEFAULT_BRANCH
+    - bash make.sh upgrade || bash make.sh install
+  only:
+    - staging-1-3
+    - ci
