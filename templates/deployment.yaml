@@ -45,7 +45,7 @@ spec:
       - name: isdc-pvphase-nrt-ops
         hostPath:
           path: /isdc/pvphase/nrt/ops
-      - name: dispatcher-conf
+      - name: dispatcher-conf-secret
         secret:
           secretName: dispatcher-conf
       - name: data-reduced-ddcache
@@ -82,7 +82,7 @@ spec:
           env:
           - name: WORKER_MODE
             value: interface
-          - name: DDA_INTERFACE_TOKEN
+          - name: DDA_USER_TOKEN
             valueFrom:
               secretKeyRef:
                 name: dda-interface-token
@@ -105,17 +105,19 @@ spec:
           - mountPath: /data/rep_base_prod_nrt
             name: isdc-pvphase-nrt-ops
             readOnly: true
-          - mountPath: /dispatcher/conf
-            name: dispatcher-conf
-            readOnly: true
           - mountPath: /data/reduced/ddcache
             name: data-reduced-ddcache
           - mountPath: /data/dispatcher_scratch
             name: dispatcher-scratch-root
 
+          - mountPath: /dispatcher/conf/conf_env.yml
+            name: dispatcher-conf-secret
+            subPath: conf_env.yml
+            readOnly: true
           - name: dispatcher-config-volume
             mountPath: /dispatcher/conf/conf.d/osa_data_server_conf.yml
             subPath: osa_data_server_conf.yml
+            readOnly: true
                 #          - name: MINIO_KEY
                 #            valueFrom:
                 #                secretKeyRef:
