@@ -30,7 +30,7 @@ deploy:
     - apk add git openssh make bash
   script:
     - helm list -A
-    - export NAMESPACE=$CI_DEFAULT_BRANCH
+    - export NAMESPACE=${CI_DEFAULT_BRANCH//./-}
     - git clone https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.astro.unige.ch/cdci/dispatcher/cdci_docker_dispatcher dispatcher -b $CI_DEFAULT_BRANCH
     - bash make.sh upgrade || bash make.sh install
   only:
