@@ -3,7 +3,7 @@
 # Declare variables to be passed into your templates.
 
 replicaCount: 1
-replicaCountPassive: 2
+replicaCountPassive: 5
 
 data:
   scratch_root: "/net/cdcicn02/scratch/shared/savchenk/data/dispatcher-scratches//staging-on-staging-1-3"
