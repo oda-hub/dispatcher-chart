@@ -6,12 +6,12 @@ function create-secret() {
 
 function install() {
     set -x
-    helm -n ${NAMESPACE:?} install oda-dispatcher . --set image.tag="$(cd dispatcher; git describe --always)"
+    helm -n ${NAMESPACE:?} install oda-dispatcher . --set image.tag="$(cd dispatcher; git describe --always)" --wait
 }
 
 function upgrade() {
     set -x
-    helm upgrade --install -n ${NAMESPACE:?} oda-dispatcher . --set image.tag="$(cd dispatcher; git describe --always)"
+    helm upgrade --install -n ${NAMESPACE:?} oda-dispatcher . --set image.tag="$(cd dispatcher; git describe --always)" --wait
 }
 
 $@
