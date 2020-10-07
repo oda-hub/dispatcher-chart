@@ -11,7 +11,7 @@ function install() {
 
 function upgrade() {
     set -x
-    helm upgrade -n ${NAMESPACE:?} oda-dispatcher . --set image.tag="$(cd dispatcher; git describe --always)"
+    helm upgrade --install -n ${NAMESPACE:?} oda-dispatcher . --set image.tag="$(cd dispatcher; git describe --always)"
 }
 
 $@
