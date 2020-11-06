@@ -18,3 +18,18 @@ data:
           dummy_cache: /data/dummy_prods
           data_server_url: http://oda-dda-interface:8000
 
+
+  magic_data_server_conf.yml: |
+    instruments:
+      magic:
+          data_server_url: http://oda-magic:8000
+  
+
+  polar_data_server_conf.yml: |
+    instruments:
+      polar:
+          dispatcher_mnt_point:
+          data_server_cache:
+          dummy_cache: dummy_prods
+          data_server_url: polar-worker
+          data_server_port: 8893

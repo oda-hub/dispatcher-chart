@@ -118,6 +118,14 @@ spec:
             mountPath: /dispatcher/conf/conf.d/osa_data_server_conf.yml
             subPath: osa_data_server_conf.yml
             readOnly: true
+          - name: dispatcher-config-volume
+            mountPath: /dispatcher/conf/conf.d/polar_data_server_conf.yml
+            subPath: polar_data_server_conf.yml
+            readOnly: true
+          - name: dispatcher-config-volume
+            mountPath: /dispatcher/conf/conf.d/magic_data_server_conf.yml
+            subPath: magic_data_server_conf.yml
+            readOnly: true
                 #          - name: MINIO_KEY
                 #            valueFrom:
                 #                secretKeyRef:
