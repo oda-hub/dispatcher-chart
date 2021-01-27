@@ -1,3 +1,4 @@
+export NAMESPACE=${NAMESPACE:-staging-1-3}
 
 function create-secret() {
     kubectl -n staging-1-3 delete secret dispatcher-conf
@@ -5,13 +6,12 @@ function create-secret() {
 }
 
 function install() {
-    set -x
-    helm -n ${NAMESPACE:?} install oda-dispatcher . --set image.tag="$(cd dispatcher; git describe --always)" --wait
+    upgrade
 }
 
 function upgrade() {
     set -x
-    helm upgrade --install -n ${NAMESPACE:?} oda-dispatcher . --set image.tag="$(cd dispatcher; git describe --always)" --wait
+    helm upgrade --install -n ${NAMESPACE:?} oda-dispatcher . --set image.tag="$(cd dispatcher; git describe --always)" 
 }
 
 $@
