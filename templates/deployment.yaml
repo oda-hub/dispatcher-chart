@@ -87,6 +87,10 @@ spec:
               secretKeyRef:
                 name: dda-interface-token
                 key: token.txt
+          - name: CELERY_BROKER
+            value: redis://oda-dispatcher-redis:6379
+          - name: CELERY_BACKEND
+            value: redis://oda-dispatcher-redis:6379
           - name: DDA_QUEUE
             value: "{{ .Values.oda.ddaQueue }}"
           - name: DQUEUE_DATABASE_URL
@@ -126,21 +130,42 @@ spec:
             mountPath: /dispatcher/conf/conf.d/magic_data_server_conf.yml
             subPath: magic_data_server_conf.yml
             readOnly: true
-                #          - name: MINIO_KEY
-                #            valueFrom:
-                #                secretKeyRef:
-                #                  name: minio-key
-                #                  key: minio-key.txt
-                #          - name: JENA_PASSWORD
-                #            valueFrom:
-                #                secretKeyRef:
-                #                  name: jena-password
-                #                  key: jena-password.txt
-                #          - name: LOGSTASH_ENTRYPOINT
-                #            valueFrom:
-                #                secretKeyRef:
-                #                  name: logstash-entrypoint
-                #  key: logstash-entrypoint.txt
+
+        - name: {{ .Chart.Name }}-celery
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+
+          command: ["celery"]
+          args: ["-A", "cdci_data_analysis.flask_app.tasks.celery", "worker", "-E"]
+
+          env:
+          - name: CELERY_BROKER
+            value: redis://oda-dispatcher-redis:6379
+          - name: CELERY_BACKEND
+            value: redis://oda-dispatcher-redis:6379
+
+          readinessProbe:
+            exec:
+              command:
+              - "/bin/sh"
+              - "-c"
+              - "celery -A path.to.app status | grep -o ': OK'"
+            initialDelaySeconds: 50
+            periodSeconds: 30
+
+          livenessProbe:
+            exec:
+              command:
+              - "/bin/sh"
+              - "-c"
+              - "celery -A path.to.app status | grep -o ': OK'"
+            initialDelaySeconds: 60
+            periodSeconds: 30
+
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
