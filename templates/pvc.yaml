@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: redis-data
+spec:
+  storageClassName: {{ default .Values.storage_class "nfs-client" }} 
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 10Gi

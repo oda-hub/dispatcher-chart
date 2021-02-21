@@ -51,6 +51,10 @@ spec:
       - name: data-reduced-ddcache
         hostPath:
           path: {{ .Values.data.reduced.ddcache }}
+
+      - name: redis-data
+        persistentVolumeClaim:
+          claimName: redis-data
       containers:
         - name: {{ .Chart.Name }}
           securityContext:
@@ -87,10 +91,6 @@ spec:
               secretKeyRef:
                 name: dda-interface-token
                 key: token.txt
-          - name: CELERY_BROKER
-            value: redis://oda-dispatcher-redis:6379
-          - name: CELERY_BACKEND
-            value: redis://oda-dispatcher-redis:6379
           - name: DDA_QUEUE
             value: "{{ .Values.oda.ddaQueue }}"
           - name: DQUEUE_DATABASE_URL
@@ -131,7 +131,7 @@ spec:
             subPath: magic_data_server_conf.yml
             readOnly: true
 
-        - name: {{ .Chart.Name }}-celery
+        - name: celery
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
@@ -140,18 +140,12 @@ spec:
           command: ["celery"]
           args: ["-A", "cdci_data_analysis.flask_app.tasks.celery", "worker", "-E"]
 
-          env:
-          - name: CELERY_BROKER
-            value: redis://oda-dispatcher-redis:6379
-          - name: CELERY_BACKEND
-            value: redis://oda-dispatcher-redis:6379
-
           readinessProbe:
             exec:
               command:
               - "/bin/sh"
               - "-c"
-              - "celery -A path.to.app status | grep -o ': OK'"
+              - "celery -A cdci_data_analysis.flask_app.tasks.celery status | grep -o ': OK'"
             initialDelaySeconds: 50
             periodSeconds: 30
 
@@ -160,12 +154,42 @@ spec:
               command:
               - "/bin/sh"
               - "-c"
-              - "celery -A path.to.app status | grep -o ': OK'"
+              - "celery -A cdci_data_analysis.flask_app.tasks.celery status | grep -o ': OK'"
             initialDelaySeconds: 60
             periodSeconds: 30
 
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
+
+        - name: redis
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: redis
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+          - name: redis
+            containerPort: 6379
+            protocol: TCP
+          livenessProbe:
+            tcpSocket:
+              port: redis
+            failureThreshold: 5
+            initialDelaySeconds: 15
+            periodSeconds: 60
+            timeoutSeconds: 30
+          readinessProbe:
+            tcpSocket:
+              port: redis
+            failureThreshold: 3
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            timeoutSeconds: 10
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          env: []
+          volumeMounts:
+          - name: redis-data
+            mountPath: /data
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
