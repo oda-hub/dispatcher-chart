@@ -98,6 +98,12 @@ spec:
               secretKeyRef:
                 name: dqueue-database-url
                 key: url.txt
+          - name: DISPATCHER_ASYNC_ENABLED
+            {{ if .Values.async_dispatcher }}
+            value: "yes"
+            {{ else }}
+            value: "no"
+            {{ end }}
           volumeMounts:
           - mountPath: /scratch
             name: scratch

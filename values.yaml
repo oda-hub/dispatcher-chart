@@ -10,6 +10,8 @@ data:
   reduced:
     ddcache: "/net/cdcicn02/scratch/shared/savchenk/data/reduced/ddcache"
 
+async_dispatcher: true
+
 image:
   repository: odahub/dispatcher
   tag: latest
