@@ -1,8 +1,11 @@
+# example is imported from:
+# https://github.com/oda-hub/dispatcher-app/blob/staging-1-3/cdci_data_analysis/config_dir/conf_env.yml
+# edit with necessary integrations and copy to make available to secret creation
 dispatcher:
     products_url: http://www.astro.unige.ch/cdci/astrooda_
     dispatcher_url: 0.0.0.0 # that's not an url, urls include port and protocol
     dispatcher_port: 8000
     sentry_url: # put here!
-    logstash_host: # put here!
+    logstash_host: # put here! (or leave empty)
     logstash_port: # put here!
     dispatcher_service_url: http://oda-dispatcher:8000 # that's an url
