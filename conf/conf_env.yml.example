@@ -5,4 +5,4 @@ dispatcher:
     sentry_url: # put here!
     logstash_host: # put here!
     logstash_port: # put here!
-    dispatcher_service_url: http://oda-dispatcher:8000 # should coincide with those in chart
+    dispatcher_service_url: http://oda-dispatcher:8000 # should coincide with those in chart, used for interface calling back the dispatcher
