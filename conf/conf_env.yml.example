@@ -1,8 +1,8 @@
 dispatcher:
-    products_url: http://www.astro.unige.ch/cdci/astrooda_
-    dispatcher_url: 0.0.0.0 # that's not an url, urls include port and protocol
-    dispatcher_port: 8000
+    products_url: https://www.astro.unige.ch/cdci/astrooda_ # base for persistent urls for resulting product 
+    dispatcher_url: 0.0.0.0 # for dispatcher to to bind, inside container please use 0.0.0.0
+    dispatcher_port: 8000 # should coincide with those in chart
     sentry_url: # put here!
     logstash_host: # put here!
     logstash_port: # put here!
-    dispatcher_service_url: http://oda-dispatcher:8000 # that's an url
+    dispatcher_service_url: http://oda-dispatcher:8000 # should coincide with those in chart
