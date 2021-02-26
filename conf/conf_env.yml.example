@@ -1,5 +1,5 @@
 dispatcher:
-    products_url: https://www.astro.unige.ch/cdci/astrooda_ # base for persistent urls for resulting product 
+    products_url: https://www.astro.unige.ch/cdci/astrooda_ # base for persistent urls for resulting product, should coincide with ingress for frontend
     dispatcher_url: 0.0.0.0 # for dispatcher to to bind, inside container please use 0.0.0.0
     dispatcher_port: 8000 # should coincide with those in chart
     sentry_url: # put here!
