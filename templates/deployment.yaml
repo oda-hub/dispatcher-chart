@@ -27,6 +27,10 @@ spec:
       - name: dispatcher-config-volume 
         configMap:
           name: dispatcher-config
+      - name: dispatcher-conf-secret
+        secret:
+          secretName: dispatcher-conf
+      {{- if (default false .Values.oda.use_hostpath) }}
       - name: scratch
         hostPath:
           path: /scratch/workers/oda/dda
@@ -45,13 +49,25 @@ spec:
       - name: isdc-pvphase-nrt-ops
         hostPath:
           path: /isdc/pvphase/nrt/ops
-      - name: dispatcher-conf-secret
-        secret:
-          secretName: dispatcher-conf
       - name: data-reduced-ddcache
         hostPath:
           path: {{ .Values.data.reduced.ddcache }}
-
+      {{- else }}
+      - name: scratch
+        persistentVolumeClaim:
+          claimName: dda-interface-scratch
+      - name: dispatcher-scratch-root
+        persistentVolumeClaim:
+          claimName: dispatcher-scratch-root
+      - name: filelogdir
+        persistentVolumeClaim:
+          claimName: dda-filelogdir
+      - name: data-reduced-ddcache
+        persistentVolumeClaim:
+          claimName: data-reduced-ddcache
+      #- name: isdc-arc-rev3
+      #- name: isdc-pvphase-nrt-ops
+      {{- end }}
       - name: redis-data
         persistentVolumeClaim:
           claimName: redis-data
@@ -98,6 +114,7 @@ spec:
               secretKeyRef:
                 name: dqueue-database-url
                 key: url.txt
+                optional: true
           - name: DISPATCHER_ASYNC_ENABLED
             {{ if .Values.async_dispatcher }}
             value: "yes"
@@ -109,12 +126,14 @@ spec:
             name: scratch
           - mountPath: /var/log/containers
             name: filelogdir
+          {{- if (default false .Values.oda.use_hostpath) }}
           - mountPath: /data/rep_base_prod
             name: isdc-arc-rev3
             readOnly: true
           - mountPath: /data/rep_base_prod_nrt
             name: isdc-pvphase-nrt-ops
             readOnly: true
+          {{- end }}
           - mountPath: /data/reduced/ddcache
             name: data-reduced-ddcache
           - mountPath: /data/dispatcher_scratch
