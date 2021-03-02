@@ -3,9 +3,66 @@ kind: PersistentVolumeClaim
 metadata:
   name: redis-data
 spec:
-  storageClassName: {{ default .Values.storage_class "nfs-client" }} 
+  storageClassName: {{ default "nfs-client" .Values.storage_class }} 
   accessModes:
     - ReadWriteMany
   resources:
     requests:
       storage: 10Gi
+{{ if not (default false .Values.oda.use_hostpath) }}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: dispatcher-scratch-root
+spec:
+  storageClassName: {{ .Values.storage_class }} 
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 30Gi
+{{ if or .Values.create_shared_pvc (not (hasKey .Values "create_shared_pvc")) }}
+{{- /*
+render the block if the value is true, OR if the value is false because the key does not exist, see https://github.com/helm/helm/issues/3308#issuecomment-781523784
+
+helm install will fail if these PVCs are already created in dda chart so we need an ability to disable them here
+*/}}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: dda-interface-scratch
+spec:
+  storageClassName: {{ .Values.storage_class }} 
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 30Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: dda-filelogdir
+spec:
+  storageClassName: {{ .Values.storage_class }} 
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 30Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: data-reduced-ddcache
+spec:
+  storageClassName: {{ .Values.storage_class }} 
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 30Gi
+{{ end }}
+{{ end }}
