@@ -164,6 +164,7 @@ spec:
 
           command: ["celery"]
           args: ["-A", "cdci_data_analysis.flask_app.tasks.celery", "worker", "-E"]
+          #args: ["-A", "cdci_data_analysis.flask_app.tasks.celery", "worker", "-E", "--autoscale=30,5"]
 
           readinessProbe:
             exec:
@@ -185,6 +186,41 @@ spec:
 
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
+        
+
+        - name: celery
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+
+          command: ["celery"]
+          args: ["-A", "cdci_data_analysis.flask_app.tasks.celery", "flower", "-l", "info", "--port=5555"]
+
+          ports:
+            - name: http
+              containerPort: 5555
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+            failureThreshold: 5
+            initialDelaySeconds: 15
+            periodSeconds: 60
+            timeoutSeconds: 30
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+            failureThreshold: 3
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            timeoutSeconds: 10
+
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+
 
         - name: redis
           securityContext:
