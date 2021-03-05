@@ -188,7 +188,7 @@ spec:
             {{- toYaml .Values.resources | nindent 12 }}
         
 
-        - name: celery
+        - name: celery-flower
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
