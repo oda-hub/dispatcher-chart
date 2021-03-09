@@ -116,11 +116,15 @@ spec:
                 key: url.txt
                 optional: true
           - name: DISPATCHER_ASYNC_ENABLED
-            {{ if .Values.async_dispatcher }}
+            {{- if .Values.async_dispatcher }}
             value: "yes"
-            {{ else }}
+            {{- else }}
             value: "no"
-            {{ end }}
+            {{- end }}
+            {{- if .Values.enforce_token }}
+          - name: DISPATCHER_ENFORCE_TOKEN
+            value: "yes" 
+            {{- end }}
           volumeMounts:
           - mountPath: /scratch
             name: scratch
