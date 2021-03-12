@@ -7,8 +7,6 @@ replicaCountPassive: 0
 
 data:
   scratch_root: "/net/cdcicn02/scratch/shared/savchenk/data/dispatcher-scratches//staging-on-staging-1-3"
-  reduced:
-    ddcache: "/net/cdcicn02/scratch/shared/savchenk/data/reduced/ddcache"
 
 async_dispatcher: true
 
@@ -78,5 +76,6 @@ tolerations: []
 affinity: {}
 
 oda:
-    use_hostpath: false
-    ddaQueue: queue-osa11
+  use_hostpath: false
+  ddaQueue: queue-osa11
+  ddcache: "/net/cdcicn02/scratch/shared/savchenk/data/reduced/ddcache"

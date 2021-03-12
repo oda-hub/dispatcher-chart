@@ -51,7 +51,7 @@ spec:
           path: /isdc/pvphase/nrt/ops
       - name: data-reduced-ddcache
         hostPath:
-          path: {{ .Values.data.reduced.ddcache }}
+          path: {{ .Values.oda.ddcache }}
       {{- else }}
       - name: scratch
         persistentVolumeClaim:
