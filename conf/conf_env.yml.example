@@ -9,3 +9,4 @@ dispatcher:
     logstash_host: # can be ignored, install your own (https://www.elastic.co/logstash) or use external https://logz.io/
     logstash_port: # see logstash_host
     dispatcher_service_url: http://oda-dispatcher:8000 # should coincide with those in chart, used for interface calling back the dispatcher
+    secret_key: 'secretkey' # key to decode jwt token

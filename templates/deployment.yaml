@@ -121,10 +121,6 @@ spec:
             {{- else }}
             value: "no"
             {{- end }}
-            {{- if .Values.enforce_token }}
-          - name: DISPATCHER_ENFORCE_TOKEN
-            value: "yes" 
-            {{- end }}
           volumeMounts:
           - mountPath: /scratch
             name: scratch
