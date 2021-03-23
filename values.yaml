@@ -62,12 +62,37 @@ ingress:
   #      - chart-example.local
 
 resources: 
-   limits:
-     cpu: 10000m
-     memory: 4096Mi
-   requests:
-     cpu: 2000m
-     memory: 2048Mi
+  dispatcher:
+    limits:
+      cpu: 5000m
+      memory: 4096Mi
+    requests:
+      cpu: 1000m
+      memory: 2048Mi
+
+  celery_flower:
+    limits:
+      cpu: 1000m
+      memory: 4096Mi
+    requests:
+      cpu: 500m
+      memory: 2048Mi
+
+  celery:
+    limits:
+      cpu: 1000m
+      memory: 4096Mi
+    requests:
+      cpu: 500m
+      memory: 2048Mi
+
+  redis:
+    limits:
+      cpu: 1000m
+      memory: 4096Mi
+    requests:
+      cpu: 500m
+      memory: 2048Mi
 
 nodeSelector: {}
 

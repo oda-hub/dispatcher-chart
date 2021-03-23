@@ -30,7 +30,7 @@ spec:
       - name: dispatcher-conf-secret
         secret:
           secretName: dispatcher-conf
-      {{- if (default false .Values.oda.use_hostpath) }}
+      {{- if (default false .Values.use_hostpath) }}
       - name: scratch
         hostPath:
           path: /scratch/workers/oda/dda
@@ -98,7 +98,7 @@ spec:
             periodSeconds: 5
             timeoutSeconds: 10
           resources:
-            {{- toYaml .Values.resources | nindent 12 }}
+            {{- toYaml .Values.resources.dispatcher | nindent 12 }}
           env:
           - name: WORKER_MODE
             value: interface
@@ -130,7 +130,7 @@ spec:
             name: scratch
           - mountPath: /var/log/containers
             name: filelogdir
-          {{- if (default false .Values.oda.use_hostpath) }}
+          {{- if (default false .Values.use_hostpath) }}
           - mountPath: /data/rep_base_prod
             name: isdc-arc-rev3
             readOnly: true
@@ -189,7 +189,7 @@ spec:
             periodSeconds: 30
 
           resources:
-            {{- toYaml .Values.resources | nindent 12 }}
+            {{- toYaml .Values.resources.celery | nindent 12 }}
         
 
         - name: celery-flower
@@ -223,7 +223,7 @@ spec:
             timeoutSeconds: 10
 
           resources:
-            {{- toYaml .Values.resources | nindent 12 }}
+            {{- toYaml .Values.resources.celery_flower | nindent 12 }}
 
 
         - name: redis
@@ -250,7 +250,7 @@ spec:
             periodSeconds: 5
             timeoutSeconds: 10
           resources:
-            {{- toYaml .Values.resources | nindent 12 }}
+            {{- toYaml .Values.resources.redis | nindent 12 }}
           env: []
           volumeMounts:
           - name: redis-data

@@ -3,7 +3,7 @@ export NAMESPACE=${NAMESPACE:-staging-1-3}
 
 
 function create-secret() {
-    kubectl -n $NAMESPACE delete secret dispatcher-conf
+    kubectl -n $NAMESPACE delete secret dispatcher-conf || echo ok
     kubectl -n $NAMESPACE create secret generic dispatcher-conf --from-file=conf_env.yml=conf/conf_env.yml
 }
 

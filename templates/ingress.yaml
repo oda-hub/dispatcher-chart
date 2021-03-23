@@ -38,6 +38,7 @@ spec:
                 name: {{ $fullName }}
                 port: 
                   number: {{ $svcPort }}
+            pathType: ImplementationSpecific
         {{- end }}
   {{- end }}
 {{- end }}
