@@ -101,6 +101,6 @@ tolerations: []
 affinity: {}
 
 oda:
-  use_hostpath: false
+  use_hostpath: true
   ddaQueue: queue-osa11
   ddcache: "/net/cdcicn02/scratch/shared/savchenk/data/reduced/ddcache"
