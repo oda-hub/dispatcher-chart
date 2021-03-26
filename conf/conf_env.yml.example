@@ -2,11 +2,26 @@
 # https://github.com/oda-hub/dispatcher-app/blob/staging-1-3/cdci_data_analysis/config_dir/conf_env.yml
 # edit with necessary integrations and copy to make available to secret creation
 dispatcher:
-    products_url: https://www.astro.unige.ch/cdci/astrooda_ # base for persistent urls for resulting product, should coincide with ingress for frontend
-    dispatcher_url: 0.0.0.0 # for dispatcher to to bind, inside container please use 0.0.0.0
-    dispatcher_port: 8000 # should coincide with those in chart
-    sentry_url: # can be ignored, register on sentry.io and  put here url for reporting issues!
-    logstash_host: # can be ignored, install your own (https://www.elastic.co/logstash) or use external https://logz.io/
-    logstash_port: # see logstash_host
-    dispatcher_service_url: http://oda-dispatcher:8000 # should coincide with those in chart, used for interface calling back the dispatcher
-    secret_key: 'secretkey' # key to decode jwt token
+   # base for persistent urls for resulting product, should coincide with ingress for frontend
+    # necessary 
+    products_url: https://www.astro.unige.ch/cdci/astrooda_ 
+    
+    # for dispatcher to to bind, inside container please use 0.0.0.0, port should coincide with those in chart (TODO: try to avoid redundancy)
+    # necessary
+    dispatcher_url: 0.0.0.0 
+    dispatcher_port: 8000 
+    
+    # register on sentry.io and  put here url for reporting issues!
+    # optional, but should be enforcable in "strict" mode
+    sentry_url:
+    
+    # can be ignored, install your own (https://www.elastic.co/logstash) or use external https://logz.io/
+    # optional, but may be be enforcable in "strict" mode
+    logstash_host: 
+    logstash_port: 
+    
+    # should coincide with those in chart, used backend interface calling back the dispatcher
+    # TODO: try to avoid redundancy
+    # necessary only for dda backend in some requests, otherwise optional. may be enforcable
+    dispatcher_service_url: http://oda-dispatcher:8000 
+
