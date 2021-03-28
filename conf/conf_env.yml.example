@@ -2,7 +2,7 @@
 # https://github.com/oda-hub/dispatcher-app/blob/staging-1-3/cdci_data_analysis/config_dir/conf_env.yml
 # edit with necessary integrations and copy to make available to secret creation
 dispatcher:
-   # base for persistent urls for resulting product, should coincide with ingress for frontend
+    # base for persistent urls for resulting product, should coincide with ingress for frontend
     # necessary 
     products_url: https://www.astro.unige.ch/cdci/astrooda_ 
     
@@ -24,4 +24,3 @@ dispatcher:
     # TODO: try to avoid redundancy
     # necessary only for dda backend in some requests, otherwise optional. may be enforcable
     dispatcher_service_url: http://oda-dispatcher:8000 
-
