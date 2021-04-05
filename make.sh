@@ -1,4 +1,4 @@
-export ODA_ENVIRONMENT=${ODA_ENVIRONMENT:-}
+export ODA_SITE=${ODA_SITE:-}
 export ODA_NAMESPACE=${ODA_NAMESPACE:-staging-1-3}
 
 
@@ -13,7 +13,7 @@ function install() {
 
 function upgrade() {
     set -x
-    helm upgrade --install -n ${ODA_NAMESPACE:?} oda-dispatcher . -f values-${ODA_ENVIRONMENT:?}.yaml --set image.tag="$(cd dispatcher; git describe --always)" 
+    helm upgrade --install -n ${ODA_NAMESPACE:?} oda-dispatcher . -f values-${ODA_SITE:?}.yaml --set image.tag="$(cd dispatcher; git describe --always)" 
 }
 
 $@
