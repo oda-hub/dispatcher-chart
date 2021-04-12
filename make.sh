@@ -1,6 +1,13 @@
 export ODA_SITE=${ODA_SITE:-}
-export ODA_NAMESPACE=${ODA_NAMESPACE:-staging-1-3}
+export ODA_NAMESPACE=${ODA_NAMESPACE:-oda-staging}
 
+function site-values() {
+    if [ "${ODA_SITE}" == "" ]; then
+        echo values.yaml
+    else
+        echo values-${ODA_SITE}.yaml
+    fi
+}
 
 function create-secret() {
     kubectl -n $ODA_NAMESPACE delete secret dispatcher-conf || echo ok
@@ -13,7 +20,7 @@ function install() {
 
 function upgrade() {
     set -x
-    helm upgrade --install -n ${ODA_NAMESPACE:?} oda-dispatcher . -f values-${ODA_SITE:?}.yaml --set image.tag="$(cd dispatcher; git describe --always)" 
+    helm upgrade --install -n ${ODA_NAMESPACE:?} oda-dispatcher . -f $(site-values) --set image.tag="$(cd dispatcher; git describe --always)" 
 }
 
 $@
