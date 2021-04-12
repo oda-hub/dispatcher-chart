@@ -13,7 +13,7 @@ function install() {
 
 function upgrade() {
     set -x
-    helm upgrade --install -n ${ODA_NAMESPACE:?} oda-dispatcher . -f values-${ODA_ENVIRONMENT:?}.yaml --set image.tag="$(cd dispatcher; git describe --always)" 
+    helm upgrade --install -n ${ODA_NAMESPACE:?} oda-dispatcher . -f values-${ODA_SITE:?}.yaml --set image.tag="$(cd dispatcher; git describe --always)" 
 }
 
 $@

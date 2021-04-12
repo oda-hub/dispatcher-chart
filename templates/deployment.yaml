@@ -30,7 +30,7 @@ spec:
       - name: dispatcher-conf-secret
         secret:
           secretName: dispatcher-conf
-      {{- if (default false .Values.use_hostpath) }}
+      {{ if .Values.use_hostpath }}
       - name: scratch
         hostPath:
           path: /scratch/workers/oda/dda
@@ -52,7 +52,7 @@ spec:
       - name: data-reduced-ddcache
         hostPath:
           path: {{ .Values.oda.ddcache }}
-      {{- else }}
+      {{ else }}
       - name: scratch
         persistentVolumeClaim:
           claimName: dda-interface-scratch
@@ -67,7 +67,7 @@ spec:
           claimName: data-reduced-ddcache
       #- name: isdc-arc-rev3
       #- name: isdc-pvphase-nrt-ops
-      {{- end }}
+      {{ end }}
       - name: redis-data
         persistentVolumeClaim:
           claimName: redis-data
@@ -126,14 +126,6 @@ spec:
             name: scratch
           - mountPath: /var/log/containers
             name: filelogdir
-          {{- if (default false .Values.use_hostpath) }}
-          - mountPath: /data/rep_base_prod
-            name: isdc-arc-rev3
-            readOnly: true
-          - mountPath: /data/rep_base_prod_nrt
-            name: isdc-pvphase-nrt-ops
-            readOnly: true
-          {{- end }}
           - mountPath: /data/reduced/ddcache
             name: data-reduced-ddcache
           - mountPath: /data/dispatcher_scratch
