@@ -13,7 +13,7 @@ async_dispatcher: true
 image:
   repository: odahub/dispatcher
   tag: latest
-  pullPolicy: IfNotExist
+  pullPolicy: IfNotPresent
 
 imagePullSecrets: []
 nameOverride: ""
