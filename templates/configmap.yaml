@@ -4,32 +4,10 @@ metadata:
   name: dispatcher-config
   namespace: {{ .Values.environment }}
 data:
-  osa_data_server_conf.yml: |
+{{- range $plugin, $conf := .Values.plugins -}}
+  {{- if $conf.enabled }}
+  {{$plugin}}_data_server_conf.yml: |
     instruments:
-      isgri:
-          dispatcher_mnt_point: /data
-          data_server_cache: reduced/ddcache
-          dummy_cache: /data/dummy_prods
-          data_server_url: http://oda-dda-interface:8000
-
-      jemx:
-          dispatcher_mnt_point: /data
-          data_server_cache: reduced/ddcache
-          dummy_cache: /data/dummy_prods
-          data_server_url: http://oda-dda-interface:8000
-
-
-  magic_data_server_conf.yml: |
-    instruments:
-      magic:
-          data_server_url: http://oda-magic:8000
-  
-
-  polar_data_server_conf.yml: |
-    instruments:
-      polar:
-          dispatcher_mnt_point:
-          data_server_cache:
-          dummy_cache: dummy_prods
-          data_server_url: polar-worker
-          data_server_port: 8893
+      {{- toYaml $conf.instruments | nindent 6 }}
+  {{- end }}
+{{- end -}}
