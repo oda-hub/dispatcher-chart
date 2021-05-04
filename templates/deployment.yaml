@@ -53,18 +53,20 @@ spec:
         hostPath:
           path: {{ .Values.oda.ddcache }}
       {{ else }}
-      - name: scratch
-        persistentVolumeClaim:
-          claimName: dda-interface-scratch
       - name: dispatcher-scratch-root
         persistentVolumeClaim:
           claimName: dispatcher-scratch-root
       - name: filelogdir
         persistentVolumeClaim:
-          claimName: dda-filelogdir
+          claimName: dispatcher-filelogdir
+      {{- if .Values.plugins.osa.enabled }}
+      - name: scratch
+        persistentVolumeClaim:
+          claimName: dda-interface-scratch
       - name: data-reduced-ddcache
         persistentVolumeClaim:
           claimName: data-reduced-ddcache
+      {{- end }}
       #- name: isdc-arc-rev3
       #- name: isdc-pvphase-nrt-ops
       {{ end }}
@@ -122,14 +124,16 @@ spec:
             value: "no"
             {{- end }}
           volumeMounts:
-          - mountPath: /scratch
-            name: scratch
           - mountPath: /var/log/containers
             name: filelogdir
-          - mountPath: /data/reduced/ddcache
-            name: data-reduced-ddcache
           - mountPath: /data/dispatcher_scratch
             name: dispatcher-scratch-root
+          {{- if .Values.plugins.osa.enabled }}
+          - mountPath: /data/reduced/ddcache
+            name: data-reduced-ddcache
+          - mountPath: /scratch
+            name: scratch
+          {{- end }}
 
           - mountPath: /dispatcher/conf/conf_env.yml
             name: dispatcher-conf-secret
