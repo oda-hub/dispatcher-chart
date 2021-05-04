@@ -101,55 +101,8 @@ tolerations: []
 affinity: {}
 
 oda:
-  use_hostpath: true
   ddaQueue: queue-osa11
   ddcache: "/net/cdcicn02/scratch/shared/savchenk/data/reduced/ddcache"
-
-plugins:
-  osa:
-    ebabled: true
-    instruments:
-      isgri:
-        dispatcher_mnt_point: /data
-        data_server_cache: reduced/ddcache
-        dummy_cache: /data/dummy_prods
-        data_server_url: http://oda-dda-interface:8000
-
-      jemx:
-        dispatcher_mnt_point: /data
-        data_server_cache: reduced/ddcache
-        dummy_cache: /data/dummy_prods
-        data_server_url: http://oda-dda-interface:8000
-
-  magic:
-    enabled: true
-    instruments:
-      magic:
-        data_server_url: http://oda-magic:8000
-        dummy_cache: /data/dummy_prods
-
-  polar:
-    enabled: true
-    instruments:
-      polar:
-        dispatcher_mnt_point:
-        data_server_cache:
-        dummy_cache: /data/dummy_prods
-        data_server_url: polar-worker
-        data_server_port: 8893
-
-  antares:
-    enabled: true
-    instruments:
-      antares:
-        data_server_url: http://oda-antares:8000
-        dummy_cache: /data/dummy_prods
-
-  spiacs:
-    enabled: true
-    instruments:
-      spi_acs:
-        dispatcher_mnt_point:
-        data_server_cache:
-        dummy_cache: /data/dummy_prods
-        data_server_url: https://www.astro.unige.ch/cdci/astrooda/dispatch-data/gw/integralhk/api/v1.0/genlc/ACS/{t0_isot}/{dt_s}
+use_hostpath: true
+mount_dda: true # mount dda-related volumes into dispatcher
+                # MUST be false if installing dispatcher without dda backend

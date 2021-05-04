@@ -59,7 +59,7 @@ spec:
       - name: filelogdir
         persistentVolumeClaim:
           claimName: dispatcher-filelogdir
-      {{- if .Values.plugins.osa.enabled }}
+      {{- if .Values.mount_dda }}
       - name: scratch
         persistentVolumeClaim:
           claimName: dda-interface-scratch
@@ -128,7 +128,7 @@ spec:
             name: filelogdir
           - mountPath: /data/dispatcher_scratch
             name: dispatcher-scratch-root
-          {{- if .Values.plugins.osa.enabled }}
+          {{- if .Values.mount_dda }}
           - mountPath: /data/reduced/ddcache
             name: data-reduced-ddcache
           - mountPath: /scratch
@@ -139,14 +139,11 @@ spec:
             name: dispatcher-conf-secret
             subPath: conf_env.yml
             readOnly: true
-
-          {{- range $plugin, $conf := .Values.plugins -}}
-            {{- if $conf.enabled }}
+          {{- range $plugin := list "osa" "magic" "polar" "antares" "spiacs" }}
           - name: dispatcher-config-volume
             mountPath: /dispatcher/conf/conf.d/{{$plugin}}_data_server_conf.yml
             subPath: {{$plugin}}_data_server_conf.yml
             readOnly: true
-            {{- end }}
           {{- end }}  
 
         - name: celery
