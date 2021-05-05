@@ -53,18 +53,20 @@ spec:
         hostPath:
           path: {{ .Values.oda.ddcache }}
       {{ else }}
-      - name: scratch
-        persistentVolumeClaim:
-          claimName: dda-interface-scratch
       - name: dispatcher-scratch-root
         persistentVolumeClaim:
           claimName: dispatcher-scratch-root
       - name: filelogdir
         persistentVolumeClaim:
-          claimName: dda-filelogdir
+          claimName: dispatcher-filelogdir
+      {{- if .Values.mount_dda }}
+      - name: scratch
+        persistentVolumeClaim:
+          claimName: dda-interface-scratch
       - name: data-reduced-ddcache
         persistentVolumeClaim:
           claimName: data-reduced-ddcache
+      {{- end }}
       #- name: isdc-arc-rev3
       #- name: isdc-pvphase-nrt-ops
       {{ end }}
@@ -122,31 +124,27 @@ spec:
             value: "no"
             {{- end }}
           volumeMounts:
-          - mountPath: /scratch
-            name: scratch
           - mountPath: /var/log/containers
             name: filelogdir
-          - mountPath: /data/reduced/ddcache
-            name: data-reduced-ddcache
           - mountPath: /data/dispatcher_scratch
             name: dispatcher-scratch-root
+          {{- if .Values.mount_dda }}
+          - mountPath: /data/reduced/ddcache
+            name: data-reduced-ddcache
+          - mountPath: /scratch
+            name: scratch
+          {{- end }}
 
           - mountPath: /dispatcher/conf/conf_env.yml
             name: dispatcher-conf-secret
             subPath: conf_env.yml
             readOnly: true
+          {{- range $plugin := list "osa" "magic" "polar" "antares" "spiacs" }}
           - name: dispatcher-config-volume
-            mountPath: /dispatcher/conf/conf.d/osa_data_server_conf.yml
-            subPath: osa_data_server_conf.yml
+            mountPath: /dispatcher/conf/conf.d/{{$plugin}}_data_server_conf.yml
+            subPath: {{$plugin}}_data_server_conf.yml
             readOnly: true
-          - name: dispatcher-config-volume
-            mountPath: /dispatcher/conf/conf.d/polar_data_server_conf.yml
-            subPath: polar_data_server_conf.yml
-            readOnly: true
-          - name: dispatcher-config-volume
-            mountPath: /dispatcher/conf/conf.d/magic_data_server_conf.yml
-            subPath: magic_data_server_conf.yml
-            readOnly: true
+          {{- end }}  
 
         - name: celery
           securityContext:
