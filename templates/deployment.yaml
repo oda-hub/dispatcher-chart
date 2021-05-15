@@ -131,8 +131,8 @@ spec:
           {{- if .Values.mount_dda }}
           - mountPath: /data/reduced/ddcache
             name: data-reduced-ddcache
-          - mountPath: /scratch
-            name: scratch
+            #- mountPath: /scratch
+            #name: scratch
           {{- end }}
 
           - mountPath: /dispatcher/conf/conf_env.yml
