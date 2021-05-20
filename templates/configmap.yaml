@@ -15,7 +15,7 @@ data:
       jemx:
         dispatcher_mnt_point: /data
         data_server_cache: reduced/ddcache
-        dummy_cache: /data/dummy_prods
+        dummy_cache: /data/dummy_prods_jemx
         data_server_url: {{ .Values.jemx_data_server_url | default "http://oda-dda-interface:8000" }}
 
 
