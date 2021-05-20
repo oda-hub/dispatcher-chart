@@ -40,7 +40,7 @@ data:
         data_server_url: {{ .Values.antares_data_server_url | default "http://oda-antares:8000" }}
         dummy_cache: dummy_prods 
 
-  spiacs_data_server_conf: |
+  spiacs_data_server_conf.yml: |
     instruments:
       spi_acs:
         dispatcher_mnt_point:
