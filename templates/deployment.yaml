@@ -152,25 +152,25 @@ spec:
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
 
-          command: ["celery"]
-          args: ["-A", "cdci_data_analysis.flask_app.tasks.celery", "worker", "-E"]
+          command: ["/bin/bash", "-c"]
+          args: ["source /init.sh; celery -A cdci_data_analysis.flask_app.tasks.celery worker -E"]
           #args: ["-A", "cdci_data_analysis.flask_app.tasks.celery", "worker", "-E", "--autoscale=30,5"]
 
           readinessProbe:
             exec:
               command:
-              - "/bin/sh"
+              - "/bin/bash"
               - "-c"
-              - "celery -A cdci_data_analysis.flask_app.tasks.celery status | grep -o ': OK'"
+              - "source /init.sh; celery -A cdci_data_analysis.flask_app.tasks.celery status | grep -o ': OK'"
             initialDelaySeconds: 50
             periodSeconds: 30
 
           livenessProbe:
             exec:
               command:
-              - "/bin/sh"
+              - "/bin/bash"
               - "-c"
-              - "celery -A cdci_data_analysis.flask_app.tasks.celery status | grep -o ': OK'"
+              - "source /init.sh; celery -A cdci_data_analysis.flask_app.tasks.celery status | grep -o ': OK'"
             initialDelaySeconds: 60
             periodSeconds: 30
 
@@ -184,8 +184,8 @@ spec:
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
 
-          command: ["celery"]
-          args: ["-A", "cdci_data_analysis.flask_app.tasks.celery", "flower", "-l", "info", "--port=5555"]
+          command: ["/bin/bash", "-c"]
+          args: ["source /init.sh; celery -A cdci_data_analysis.flask_app.tasks.celery flower -l info --port=5555"]
 
           ports:
             - name: http
