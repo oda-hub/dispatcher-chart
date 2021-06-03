@@ -10,6 +10,8 @@ spec:
     matchLabels:
       app.kubernetes.io/name: {{ include "chart.name" . }}
       app.kubernetes.io/instance: {{ .Release.Name }}
+  strategy:
+    type: Recreate # better RollingUpdate, but needed for once mounted
   template:
     metadata:
       labels:
@@ -31,10 +33,6 @@ spec:
         secret:
           secretName: dispatcher-conf
       {{ if .Values.use_hostpath }}
-      - name: scratch
-        hostPath:
-          path: /scratch/workers/oda/dda
-          type: DirectoryOrCreate
       - name: dispatcher-scratch-root
         hostPath:
           path: {{ .Values.data.scratch_root }}
@@ -60,9 +58,6 @@ spec:
         persistentVolumeClaim:
           claimName: dispatcher-filelogdir
       {{- if .Values.mount_dda }}
-      - name: scratch
-        persistentVolumeClaim:
-          claimName: dda-interface-scratch
       - name: data-reduced-ddcache
         persistentVolumeClaim:
           claimName: data-reduced-ddcache
@@ -70,9 +65,11 @@ spec:
       #- name: isdc-arc-rev3
       #- name: isdc-pvphase-nrt-ops
       {{ end }}
+      {{- if .Values.async_dispatcher -}}
       - name: redis-data
         persistentVolumeClaim:
           claimName: redis-data
+      {{- end -}}
       containers:
         - name: {{ .Chart.Name }}
           securityContext:
@@ -131,8 +128,6 @@ spec:
           {{- if .Values.mount_dda }}
           - mountPath: /data/reduced/ddcache
             name: data-reduced-ddcache
-            #- mountPath: /scratch
-            #name: scratch
           {{- end }}
 
           - mountPath: /dispatcher/conf/conf_env.yml
@@ -146,6 +141,7 @@ spec:
             readOnly: true
           {{- end }}  
 
+      {{- if .Values.async_dispatcher -}}
         - name: celery
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
@@ -241,6 +237,7 @@ spec:
           volumeMounts:
           - name: redis-data
             mountPath: /data
+      {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

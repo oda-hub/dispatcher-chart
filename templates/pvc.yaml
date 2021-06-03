@@ -3,9 +3,10 @@ kind: PersistentVolumeClaim
 metadata:
   name: redis-data
 spec:
-  storageClassName: {{ .Values.storage_class_rwmany }}
+  storageClassName: {{ .Values.storage_class }}
   accessModes:
-    - ReadWriteMany
+    - ReadWriteOnce
+      #- ReadWriteMany
   resources:
     requests:
       storage: 10Gi
@@ -18,9 +19,10 @@ kind: PersistentVolumeClaim
 metadata:
   name: dispatcher-scratch-root
 spec:
-  storageClassName: {{ .Values.storage_class_rwmany }} 
+  storageClassName: {{ .Values.storage_class }} 
   accessModes:
-    - ReadWriteMany
+    - ReadWriteOnce
+      #- ReadWriteMany
   resources:
     requests:
       storage: 30Gi
@@ -31,13 +33,29 @@ kind: PersistentVolumeClaim
 metadata:
   name: dispatcher-filelogdir
 spec:
-  storageClassName: {{ .Values.storage_class_rwmany }} 
+  storageClassName: {{ .Values.storage_class }} 
   accessModes:
-    - ReadWriteMany
+    - ReadWriteOnce
+      #- ReadWriteMany
   resources:
     requests:
       storage: 30Gi
 ---
 # PersistentVolumeClaims related to dda and ddcache should be defined only in dda, since they are useless in the dispatcher if dda is not deployed
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: data-reduced-ddcache
+spec:
+  storageClassName: {{ .Values.storage_class }} 
+  accessModes:
+    - ReadWriteOnce
+      #- ReadWriteMany
+  resources:
+    requests:
+      storage: 30Gi
+---
 
 {{ end }}
