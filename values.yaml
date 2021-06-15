@@ -105,5 +105,6 @@ oda:
   ddaQueue: queue-osa11
   ddcache: "/net/cdcicn02/scratch/shared/savchenk/data/reduced/ddcache"
 use_hostpath: true
+
 mount_dda: true # mount dda-related volumes into dispatcher
-                # MUST be false if installing dispatcher without dda backend
+                # could be false if installing dispatcher without dda backend
