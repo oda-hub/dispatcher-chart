@@ -1,3 +1,4 @@
+{{- if .Values.async_dispatcher }}
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
@@ -10,7 +11,7 @@ spec:
   resources:
     requests:
       storage: 10Gi
-
+{{ end }}
 
 {{ if not (default false .Values.use_hostpath) }}
 ---
@@ -42,7 +43,7 @@ spec:
       storage: 30Gi
 # PersistentVolumeClaims related to dda and ddcache are useless in the dispatcher if dda is not deployed
 
-#{{- if .Values.mount_dda }}
+{{- if .Values.mount_dda }}
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
@@ -55,6 +56,6 @@ spec:
   resources:
     requests:
       storage: 30Gi
-#{{ end }}
+{{ end }}
 
 {{ end }}
