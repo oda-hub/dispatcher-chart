@@ -40,9 +40,9 @@ spec:
   resources:
     requests:
       storage: 30Gi
----
-# PersistentVolumeClaims related to dda and ddcache should be defined only in dda, since they are useless in the dispatcher if dda is not deployed
+# PersistentVolumeClaims related to dda and ddcache are useless in the dispatcher if dda is not deployed
 
+#{{- if .Values.mount_dda }}
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
@@ -51,11 +51,10 @@ metadata:
 spec:
   storageClassName: {{ .Values.storage_class }} 
   accessModes:
-    - ReadWriteOnce
-      #- ReadWriteMany
+    - ReadWriteOnce      #- ReadWriteMany
   resources:
     requests:
       storage: 30Gi
----
+#{{ end }}
 
 {{ end }}
