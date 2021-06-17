@@ -31,40 +31,18 @@ spec:
           name: dispatcher-config
       - name: dispatcher-conf-secret
         secret:
-          secretName: dispatcher-conf
-      {{ if .Values.use_hostpath }}
-      - name: dispatcher-scratch-root
-        hostPath:
-          path: {{ .Values.data.scratch_root }}
-          type: DirectoryOrCreate
-      - name: filelogdir
-        hostPath:
-          path: /scratch/workers/oda/dda-logs
-          type: DirectoryOrCreate
-      - name: isdc-arc-rev3
-        hostPath:
-          path: /isdc/arc/rev_3
-      - name: isdc-pvphase-nrt-ops
-        hostPath:
-          path: /isdc/pvphase/nrt/ops
-      - name: data-reduced-ddcache
-        hostPath:
-          path: {{ .Values.oda.ddcache }}
-      {{ else }}
+          secretName: dispatcher-conf      
       - name: dispatcher-scratch-root
         persistentVolumeClaim:
           claimName: dispatcher-scratch-root
       - name: filelogdir
         persistentVolumeClaim:
           claimName: dispatcher-filelogdir
-      {{- if .Values.mount_dda }}
-      - name: data-reduced-ddcache
+      {{- if .Values.dda.enable }}
+      - name: {{ .Values.dda.ddcache.pvc_name }}
         persistentVolumeClaim:
           claimName: data-reduced-ddcache
       {{- end }}
-      #- name: isdc-arc-rev3
-      #- name: isdc-pvphase-nrt-ops
-      {{ end }}
       
       {{ if .Values.async_dispatcher }}
       - name: redis-data
@@ -101,21 +79,6 @@ spec:
           resources:
             {{- toYaml .Values.resources.dispatcher | nindent 12 }}
           env:
-          - name: WORKER_MODE
-            value: interface
-          - name: DDA_USER_TOKEN
-            valueFrom:
-              secretKeyRef:
-                name: dda-interface-token
-                key: token.txt
-          - name: DDA_QUEUE
-            value: "{{ .Values.oda.ddaQueue }}"
-          - name: DQUEUE_DATABASE_URL
-            valueFrom:
-              secretKeyRef:
-                name: dqueue-database-url
-                key: url.txt
-                optional: true
           - name: DISPATCHER_ASYNC_ENABLED
             {{- if .Values.async_dispatcher }}
             value: "yes"
@@ -127,7 +90,7 @@ spec:
             name: filelogdir
           - mountPath: /data/dispatcher_scratch
             name: dispatcher-scratch-root
-          {{- if .Values.mount_dda }}
+          {{- if .Values.dda.enable }}
           - mountPath: /data/reduced/ddcache
             name: data-reduced-ddcache
           {{- end }}

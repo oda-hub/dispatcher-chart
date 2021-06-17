@@ -13,8 +13,8 @@ spec:
       storage: 10Gi
 {{ end }}
 
-{{ if not (default false .Values.use_hostpath) }}
 ---
+# used to track state of jobs
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
@@ -29,6 +29,7 @@ spec:
       storage: 30Gi
 
 ---
+# used additional log location, for occasional inspections
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
@@ -41,21 +42,23 @@ spec:
   resources:
     requests:
       storage: 30Gi
-# PersistentVolumeClaims related to dda and ddcache are useless in the dispatcher if dda is not deployed
 
-{{- if .Values.mount_dda }}
+# PersistentVolumeClaims related to dda and ddcache are not useful in the dispatcher if dda is not deployed
+{{- if .Values.dda.enable }}
+{{- if eq .Values.dda.ddcache.origin "create_pvc" }}
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: data-reduced-ddcache
+  name: {{ .Values.dda.ddcache.pvc_name }}
 spec:
   storageClassName: {{ .Values.storage_class }} 
   accessModes:
-    - ReadWriteOnce      #- ReadWriteMany
+    - ReadWriteOnce      
+    #- ReadWriteMany
   resources:
     requests:
       storage: 30Gi
+      
 {{ end }}
-
 {{ end }}

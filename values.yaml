@@ -101,10 +101,15 @@ tolerations: []
 
 affinity: {}
 
-oda:
-  ddaQueue: queue-osa11
-  ddcache: "/net/cdcicn02/scratch/shared/savchenk/data/reduced/ddcache"
-use_hostpath: true
+dda:
+  # create and mount dda-related volumes into dispatcher
+  # could be false if installing dispatcher without dda backend
+  enable: true
 
-mount_dda: true # mount dda-related volumes into dispatcher
-                # could be false if installing dispatcher without dda backend
+  ddcache:
+    origin: create_pvc
+    pvc_name: data-reduced-ddcache
+    # origin: mount_pvc
+    # origin: hostpath
+    # hostpath: 
+
