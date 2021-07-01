@@ -85,6 +85,13 @@ spec:
             {{- else }}
             value: "no"
             {{- end }}
+          {{ if .Values.dda.enable }}
+          - name: DDA_USER_TOKEN
+            valueFrom:
+              secretKeyRef:
+                name: dda-interface-token
+                key: token.txt
+          {{- end }}   
           volumeMounts:
           - mountPath: /var/log/containers
             name: filelogdir
