@@ -20,10 +20,10 @@ kind: PersistentVolumeClaim
 metadata:
   name: dispatcher-scratch-root
 spec:
-  storageClassName: {{ .Values.storage_class }} 
+  storageClassName: {{ .Values.storage_class_rwmany }} 
   accessModes:
-    - ReadWriteOnce
-      #- ReadWriteMany
+      #- ReadWriteOnce
+    - ReadWriteMany
   resources:
     requests:
       storage: 30Gi
@@ -35,10 +35,10 @@ kind: PersistentVolumeClaim
 metadata:
   name: dispatcher-filelogdir
 spec:
-  storageClassName: {{ .Values.storage_class }} 
+  storageClassName: {{ .Values.storage_class_rwmany }} 
   accessModes:
-    - ReadWriteOnce
-      #- ReadWriteMany
+      #- ReadWriteOnce
+    - ReadWriteMany
   resources:
     requests:
       storage: 30Gi
@@ -52,10 +52,10 @@ kind: PersistentVolumeClaim
 metadata:
   name: {{ .Values.dda.ddcache.pvc_name }}
 spec:
-  storageClassName: {{ .Values.storage_class }} 
+  storageClassName: {{ .Values.storage_class_rwmany }} 
   accessModes:
-    - ReadWriteOnce      
-    #- ReadWriteMany
+    #- ReadWriteOnce      
+    - ReadWriteMany
   resources:
     requests:
       storage: 30Gi
