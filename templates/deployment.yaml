@@ -82,6 +82,12 @@ spec:
           env:
           - name: ODA_SPARQL_ROOT
             value: {{ .Values.oda_sparql_root }}
+          - name: DISPATCHER_GUNICORN
+            {{- if .Values.dispatcher_gunicorn }}
+            value: "yes"
+            {{- else }}
+            value: "no"
+            {{- end }}
           - name: DISPATCHER_ASYNC_ENABLED
             {{- if .Values.async_dispatcher }}
             value: "yes"
@@ -116,6 +122,7 @@ spec:
             readOnly: true
           {{- end }}  
 
+       {{ if .Values.async_dispatcher }}
         - name: redis
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
@@ -147,7 +154,6 @@ spec:
             mountPath: /data
 
 
-      {{- if .Values.async_dispatcher }}
         - name: celery
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
