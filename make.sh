@@ -18,9 +18,41 @@ function install() {
     upgrade
 }
 
+function compute-version() {
+    for d in dispatcher/*; do  (
+        if cd $d > /dev/null 2>&1; then
+            if ls -d .git > /dev/null 2>&1; then
+                echo "$d: "
+                echo -n "  branch: "; git branch | awk 'NF>1 {printf "branch: "$2"\n"}'
+                echo -n "  revision: "; git describe --tags --always
+            fi
+        fi
+    ); done
+}
+
 function upgrade() {
     set -x
+
+    (echo -e "Deploying **$(pwd | xargs basename)** to $ODA_NAMESPACE:\n***\n"; bash make.sh compute-version) | \
+                   bash make.sh mattermost deployment-$ODA_NAMESPACE
+
     helm upgrade --install -n ${ODA_NAMESPACE:?} oda-dispatcher . -f $(site-values) --set image.tag="$(cd dispatcher; git describe --always)" 
+
 }
+
+
+function mattermost() {
+    channel=${1:?}
+    message=${2:-stdin}
+
+    if [ $message == "stdin" ]; then
+        message=$(cat)
+    fi
+
+    curl -i -X POST -H 'Content-Type: application/json' \
+        -d '{"channel": "'"$channel"'", "text": "'"${message:?}"' :tada:"}' \
+        ${MATTERMOST_HOOK:?}
+}
+
 
 $@
