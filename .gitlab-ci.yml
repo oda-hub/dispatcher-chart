@@ -7,6 +7,8 @@ build:
   # Official docker image.
   image: docker:stable
   stage: build
+  before_script:
+    - apk add git openssh make bash
   script:
     - make push -C dispatcher-container
   artifacts:
