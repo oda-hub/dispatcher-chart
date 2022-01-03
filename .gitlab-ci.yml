@@ -1,5 +1,5 @@
 variables:
-  GIT_SUBMODULE_STRATEGY: recursive
+  GIT_SUBMODULE_STRATEGY: normal
 
 
 stages:
@@ -10,6 +10,8 @@ build:
   # Official docker image.
   image: docker:stable
   stage: build
+  variables:
+    GIT_SUBMODULE_STRATEGY: recursive
   before_script:
     - apk add git openssh make bash
     - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
