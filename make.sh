@@ -33,7 +33,7 @@ function compute-version() {
 function upgrade() {
     set -xe
 
-    helm upgrade -w --install -n ${ODA_NAMESPACE:?} oda-dispatcher . -f $(site-values) --set image.tag="$(cd dispatcher-container; git describe --always)" 
+    helm upgrade --wait --install -n ${ODA_NAMESPACE:?} oda-dispatcher . -f $(site-values) --set image.tag="$(cd dispatcher-container; git describe --always)" 
 
     (echo -e "Deployed **$(pwd | xargs basename)** to $ODA_NAMESPACE:\n***\n"; bash make.sh compute-version) | \
         bash make.sh mattermost deployment-$ODA_NAMESPACE
