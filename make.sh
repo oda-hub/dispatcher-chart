@@ -1,17 +1,58 @@
+export ODA_SITE=${ODA_SITE:-}
+export ODA_NAMESPACE=${ODA_NAMESPACE:-oda-staging}
+
+function site-values() {
+    if [ "${ODA_SITE}" == "" ]; then
+        echo values.yaml
+    else
+        echo values-${ODA_SITE}.yaml
+    fi
+}
 
 function create-secret() {
-    kubectl -n staging-1-3 delete secret dispatcher-conf
-    kubectl -n staging-1-3 create secret generic dispatcher-conf --from-file=conf_env.yml=dispatcher/conf/conf_env.yml
+    kubectl -n $ODA_NAMESPACE delete secret dispatcher-conf || echo ok
+    kubectl -n $ODA_NAMESPACE create secret generic dispatcher-conf --from-file=conf_env.yml=conf/conf_env.yml
 }
 
 function install() {
-    set -x
-    helm -n ${NAMESPACE:?} install oda-dispatcher . --set image.tag="$(cd dispatcher; git describe --always)"
+    upgrade
+}
+
+function compute-version() {
+    for d in dispatcher/*; do  (
+        if cd $d > /dev/null 2>&1; then
+            if ls -d .git > /dev/null 2>&1; then
+                echo "$d: "
+                echo -n "  branch: "; git branch | awk 'NF>1 {printf "branch: "$2"\n"}'
+                echo -n "  revision: "; git describe --tags --always
+            fi
+        fi
+    ); done
 }
 
 function upgrade() {
     set -x
-    helm upgrade --install -n ${NAMESPACE:?} oda-dispatcher . --set image.tag="$(cd dispatcher; git describe --always)"
+
+
+    helm upgrade --install -n ${ODA_NAMESPACE:?} oda-dispatcher . -f $(site-values) --set image.tag="$(cd dispatcher; git describe --always)"  && {
+        (echo -e "Deploying **$(pwd | xargs basename)** to $ODA_NAMESPACE:\n***\n"; bash make.sh compute-version) | \
+                       bash make.sh mattermost deployment-$ODA_NAMESPACE
+    }
 }
+
+
+function mattermost() {
+    channel=${1:?}
+    message=${2:-stdin}
+
+    if [ $message == "stdin" ]; then
+        message=$(cat)
+    fi
+
+    curl -i -X POST -H 'Content-Type: application/json' \
+        -d '{"channel": "'"$channel"'", "text": "'"${message:?}"' :tada:"}' \
+        ${MATTERMOST_HOOK:?}
+}
+
 
 $@

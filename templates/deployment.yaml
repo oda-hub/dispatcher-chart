@@ -10,6 +10,9 @@ spec:
     matchLabels:
       app.kubernetes.io/name: {{ include "chart.name" . }}
       app.kubernetes.io/instance: {{ .Release.Name }}
+  strategy:
+    type: RollingUpdate
+    #type: Recreate # better RollingUpdate, but needed for once mounted
   template:
     metadata:
       labels:
@@ -27,30 +30,27 @@ spec:
       - name: dispatcher-config-volume 
         configMap:
           name: dispatcher-config
-      - name: scratch
-        hostPath:
-          path: /scratch/workers/oda/dda
-          type: DirectoryOrCreate
-      - name: dispatcher-scratch-root
-        hostPath:
-          path: {{ .Values.data.scratch_root }}
-          type: DirectoryOrCreate
-      - name: filelogdir
-        hostPath:
-          path: /scratch/workers/oda/dda-logs
-          type: DirectoryOrCreate
-      - name: isdc-arc-rev3
-        hostPath:
-          path: /isdc/arc/rev_3
-      - name: isdc-pvphase-nrt-ops
-        hostPath:
-          path: /isdc/pvphase/nrt/ops
       - name: dispatcher-conf-secret
         secret:
-          secretName: dispatcher-conf
-      - name: data-reduced-ddcache
-        hostPath:
-          path: {{ .Values.data.reduced.ddcache }}
+          secretName: dispatcher-conf      
+      - name: dispatcher-scratch-root
+        persistentVolumeClaim:
+          claimName: dispatcher-scratch-root
+      - name: filelogdir
+        persistentVolumeClaim:
+          claimName: dispatcher-filelogdir
+      {{- if .Values.dda.enable }}
+      - name: {{ .Values.dda.ddcache.pvc_name }}
+        persistentVolumeClaim:
+          claimName: data-reduced-ddcache
+      {{- end }}
+      
+      {{ if .Values.async_dispatcher }}
+      - name: redis-data
+        persistentVolumeClaim:
+          claimName: redis-data
+      {{ end }}
+
       containers:
         - name: {{ .Chart.Name }}
           securityContext:
@@ -78,61 +78,149 @@ spec:
             periodSeconds: 5
             timeoutSeconds: 10
           resources:
-            {{- toYaml .Values.resources | nindent 12 }}
+            {{- toYaml .Values.resources.dispatcher | nindent 12 }}
           env:
-          - name: WORKER_MODE
-            value: interface
+          - name: ODA_SPARQL_ROOT
+            value: {{ .Values.oda_sparql_root }}
+          - name: DISPATCHER_GUNICORN
+            {{- if .Values.dispatcher_gunicorn }}
+            value: "yes"
+            {{- else }}
+            value: "no"
+            {{- end }}
+          - name: DISPATCHER_ASYNC_ENABLED
+            {{- if .Values.async_dispatcher }}
+            value: "yes"
+            {{- else }}
+            value: "no"
+            {{- end }}
+          {{ if .Values.dda.enable }}
           - name: DDA_USER_TOKEN
             valueFrom:
               secretKeyRef:
                 name: dda-interface-token
                 key: token.txt
-          - name: DDA_QUEUE
-            value: "{{ .Values.oda.ddaQueue }}"
-          - name: DQUEUE_DATABASE_URL
-            valueFrom:
-              secretKeyRef:
-                name: dqueue-database-url
-                key: url.txt
+          {{- end }}   
           volumeMounts:
-          - mountPath: /scratch
-            name: scratch
           - mountPath: /var/log/containers
             name: filelogdir
-          - mountPath: /data/rep_base_prod
-            name: isdc-arc-rev3
-            readOnly: true
-          - mountPath: /data/rep_base_prod_nrt
-            name: isdc-pvphase-nrt-ops
-            readOnly: true
-          - mountPath: /data/reduced/ddcache
-            name: data-reduced-ddcache
           - mountPath: /data/dispatcher_scratch
             name: dispatcher-scratch-root
+          {{- if .Values.dda.enable }}
+          - mountPath: /data/reduced/ddcache
+            name: data-reduced-ddcache
+          {{- end }}
 
           - mountPath: /dispatcher/conf/conf_env.yml
             name: dispatcher-conf-secret
             subPath: conf_env.yml
             readOnly: true
+          {{- range $plugin := list "osa" "magic" "polar" "antares" "spiacs" }}
           - name: dispatcher-config-volume
-            mountPath: /dispatcher/conf/conf.d/osa_data_server_conf.yml
-            subPath: osa_data_server_conf.yml
+            mountPath: /dispatcher/conf/conf.d/{{$plugin}}_data_server_conf.yml
+            subPath: {{$plugin}}_data_server_conf.yml
             readOnly: true
-                #          - name: MINIO_KEY
-                #            valueFrom:
-                #                secretKeyRef:
-                #                  name: minio-key
-                #                  key: minio-key.txt
-                #          - name: JENA_PASSWORD
-                #            valueFrom:
-                #                secretKeyRef:
-                #                  name: jena-password
-                #                  key: jena-password.txt
-                #          - name: LOGSTASH_ENTRYPOINT
-                #            valueFrom:
-                #                secretKeyRef:
-                #                  name: logstash-entrypoint
-                #  key: logstash-entrypoint.txt
+          {{- end }}  
+
+       {{ if .Values.async_dispatcher }}
+        - name: redis
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: redis
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+          - name: redis
+            containerPort: 6379
+            protocol: TCP
+          livenessProbe:
+            tcpSocket:
+              port: redis
+            failureThreshold: 5
+            initialDelaySeconds: 15
+            periodSeconds: 60
+            timeoutSeconds: 30
+          readinessProbe:
+            tcpSocket:
+              port: redis
+            failureThreshold: 3
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            timeoutSeconds: 10
+          resources:
+            {{- toYaml .Values.resources.redis | nindent 12 }}
+          env: []
+          volumeMounts:
+          - name: redis-data
+            mountPath: /data
+
+
+        - name: celery
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+
+          command: ["celery"]
+          args: ["-A", "cdci_data_analysis.flask_app.tasks.celery", "worker", "-E"]
+          #args: ["-A", "cdci_data_analysis.flask_app.tasks.celery", "worker", "-E", "--autoscale=30,5"]
+
+          readinessProbe:
+            exec:
+              command:
+              - "/bin/sh"
+              - "-c"
+              - "celery -A cdci_data_analysis.flask_app.tasks.celery status | grep -o ': OK'"
+            initialDelaySeconds: 50
+            periodSeconds: 30
+
+          livenessProbe:
+            exec:
+              command:
+              - "/bin/sh"
+              - "-c"
+              - "celery -A cdci_data_analysis.flask_app.tasks.celery status | grep -o ': OK'"
+            initialDelaySeconds: 60
+            periodSeconds: 30
+
+          resources:
+            {{- toYaml .Values.resources.celery | nindent 12 }}
+        
+
+        - name: celery-flower
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+
+          command: ["celery"]
+          args: ["-A", "cdci_data_analysis.flask_app.tasks.celery", "flower", "-l", "info", "--port=5555"]
+
+          ports:
+            - name: http
+              containerPort: 5555
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+            failureThreshold: 5
+            initialDelaySeconds: 15
+            periodSeconds: 60
+            timeoutSeconds: 30
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+            failureThreshold: 3
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            timeoutSeconds: 10
+
+          resources:
+            {{- toYaml .Values.resources.celery_flower | nindent 12 }}
+
+
+      {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

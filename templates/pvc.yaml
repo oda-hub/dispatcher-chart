@@ -1,0 +1,64 @@
+{{- if .Values.async_dispatcher }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: redis-data
+spec:
+  storageClassName: {{ .Values.storage_class }}
+  accessModes:
+    - ReadWriteOnce
+      #- ReadWriteMany
+  resources:
+    requests:
+      storage: 10Gi
+{{ end }}
+
+---
+# used to track state of jobs
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: dispatcher-scratch-root
+spec:
+  storageClassName: {{ .Values.storage_class_rwmany }} 
+  accessModes:
+      #- ReadWriteOnce
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 30Gi
+
+---
+# used additional log location, for occasional inspections
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: dispatcher-filelogdir
+spec:
+  storageClassName: {{ .Values.storage_class_rwmany }} 
+  accessModes:
+      #- ReadWriteOnce
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 30Gi
+
+# PersistentVolumeClaims related to dda and ddcache are not useful in the dispatcher if dda is not deployed
+{{- if .Values.dda.enable }}
+{{- if eq .Values.dda.ddcache.origin "create_pvc" }}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ .Values.dda.ddcache.pvc_name }}
+spec:
+  storageClassName: {{ .Values.storage_class_rwmany }} 
+  accessModes:
+    #- ReadWriteOnce      
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 30Gi
+      
+{{ end }}
+{{ end }}

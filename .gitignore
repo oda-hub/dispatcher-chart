@@ -1,0 +1,6 @@
+dispatcher 
+*.gpg
+conf/conf_env.yml
+values-*.yaml
+conf/*
+!conf/*example*

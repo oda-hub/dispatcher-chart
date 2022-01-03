@@ -7,8 +7,8 @@ replicaCountPassive: 0
 
 data:
   scratch_root: "/net/cdcicn02/scratch/shared/savchenk/data/dispatcher-scratches//staging-on-staging-1-3"
-  reduced:
-    ddcache: "/net/cdcicn02/scratch/shared/savchenk/data/reduced/ddcache"
+
+async_dispatcher: true
 
 image:
   repository: odahub/dispatcher
@@ -35,7 +35,8 @@ securityContext: #{}
   #   - ALL
   #readOnlyRootFilesystem: true
   runAsNonRoot: true
-  runAsUser: 1000
+  runAsUser: 5182
+  runAsGroup: 4700
 
 service:
   type: ClusterIP
@@ -45,6 +46,7 @@ ingress:
   enabled: true
   annotations: #{}
     nginx.ingress.kubernetes.io/rewrite-target: /$2
+    ingress.kubernetes.io/proxy-body-size: 50m
     kubernetes.io/ingress.class: nginx
     # kubernetes.io/tls-acme: "true"
   hosts:
@@ -61,12 +63,37 @@ ingress:
   #      - chart-example.local
 
 resources: 
-   limits:
-     cpu: 500m
-     memory: 1024Mi
-   requests:
-     cpu: 500m
-     memory: 1024Mi
+  dispatcher:
+    limits:
+      cpu: 5000m
+      memory: 4096Mi
+    requests:
+      cpu: 1000m
+      memory: 2048Mi
+
+  celery_flower:
+    limits:
+      cpu: 1000m
+      memory: 4096Mi
+    requests:
+      cpu: 500m
+      memory: 2048Mi
+
+  celery:
+    limits:
+      cpu: 1000m
+      memory: 4096Mi
+    requests:
+      cpu: 500m
+      memory: 2048Mi
+
+  redis:
+    limits:
+      cpu: 1000m
+      memory: 4096Mi
+    requests:
+      cpu: 500m
+      memory: 2048Mi
 
 nodeSelector: {}
 
@@ -74,5 +101,15 @@ tolerations: []
 
 affinity: {}
 
-oda:
-    ddaQueue: queue-osa11
+dda:
+  # create and mount dda-related volumes into dispatcher
+  # could be false if installing dispatcher without dda backend
+  enable: true
+
+  ddcache:
+    origin: create_pvc
+    pvc_name: data-reduced-ddcache
+    # origin: mount_pvc
+    # origin: hostpath
+    # hostpath: 
+

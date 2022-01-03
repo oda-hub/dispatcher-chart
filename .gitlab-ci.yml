@@ -3,7 +3,7 @@ stages:
   - deploy
 
 
-docker-build:
+build:
   # Official docker image.
   image: docker:stable
   stage: build
@@ -20,7 +20,7 @@ deploy:
   image: alpine/helm
   stage: deploy
   dependencies: 
-    - docker-build
+    - build
   before_script:
     - apk add git openssh make bash
   script:
