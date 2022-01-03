@@ -6,3 +6,6 @@ install:
 
 create-secrets:
 	bash make.sh create-secret
+
+update:
+	bash make.sh update $@
