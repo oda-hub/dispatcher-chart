@@ -3,7 +3,7 @@ stages:
   - deploy
 
 
-docker-build:
+build:
   # Official docker image.
   image: docker:stable
   stage: build
