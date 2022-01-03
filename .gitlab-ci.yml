@@ -18,6 +18,7 @@ build:
     - docker info
   script:
     - make push -C dispatcher-container
+    - bash make.sh compute-version > version-long
   artifacts:
     untracked: true
   only:
