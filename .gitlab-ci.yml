@@ -30,7 +30,7 @@ deploy:
     - build
   before_script:
     - apk add git openssh make bash
-    - git clone https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.astro.unige.ch:oda/site-config.git
+    - git clone https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.astro.unige.ch/oda/site-config.git
     - cp -fv site-config/values-unige-dstic-staging.yaml .
   script:
     - export ODA_NAMESPACE=oda-staging
