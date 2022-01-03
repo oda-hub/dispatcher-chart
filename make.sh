@@ -19,7 +19,7 @@ function install() {
 }
 
 function compute-version() {
-    for d in dispatcher/*; do  (
+    for d in dispatcher-container/*; do  (
         if cd $d > /dev/null 2>&1; then
             if ls -d .git > /dev/null 2>&1; then
                 echo "$d: "
@@ -34,7 +34,7 @@ function upgrade() {
     set -x
 
 
-    helm upgrade --install -n ${ODA_NAMESPACE:?} oda-dispatcher . -f $(site-values) --set image.tag="$(cd dispatcher; git describe --always)"  && {
+    helm upgrade --install -n ${ODA_NAMESPACE:?} oda-dispatcher . -f $(site-values) --set image.tag="$(cd dispatcher-container; git describe --always)"  && {
         (echo -e "Deploying **$(pwd | xargs basename)** to $ODA_NAMESPACE:\n***\n"; bash make.sh compute-version) | \
                        bash make.sh mattermost deployment-$ODA_NAMESPACE
     }
