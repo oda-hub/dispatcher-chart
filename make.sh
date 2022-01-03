@@ -31,13 +31,12 @@ function compute-version() {
 }
 
 function upgrade() {
-    set -x
+    set -xe
 
+    helm upgrade -w --install -n ${ODA_NAMESPACE:?} oda-dispatcher . -f $(site-values) --set image.tag="$(cd dispatcher-container; git describe --always)" 
 
-    helm upgrade --install -n ${ODA_NAMESPACE:?} oda-dispatcher . -f $(site-values) --set image.tag="$(cd dispatcher-container; git describe --always)"  && {
-        (echo -e "Deploying **$(pwd | xargs basename)** to $ODA_NAMESPACE:\n***\n"; bash make.sh compute-version) | \
-                       bash make.sh mattermost deployment-$ODA_NAMESPACE
-    }
+    (echo -e "Deployed **$(pwd | xargs basename)** to $ODA_NAMESPACE:\n***\n"; bash make.sh compute-version) | \
+        bash make.sh mattermost deployment-$ODA_NAMESPACE
 }
 
 
