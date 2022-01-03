@@ -25,7 +25,7 @@ deploy:
   image: alpine/helm
   stage: deploy
   dependencies: 
-    - docker-build
+    - build
   before_script:
     - apk add git openssh make bash
   script:
