@@ -57,7 +57,7 @@ function update() {
     set -xe
     revision=${1:?e.g. \"master\"}
 
-    git submodule foreach --recursive bash -c 'echo -e "\033[33mupdating $PWD\033[0m"; git pull origin master; git pull origin master'
+    git submodule foreach --recursive bash -c 'echo -e "\033[33mupdating $PWD\033[0m"; git checkout master; git pull origin master'
     (cd dispatcher-container; git commit -a -m "update submodules"; git push)
     git commit -a -m "update submodules"; git push
 }
