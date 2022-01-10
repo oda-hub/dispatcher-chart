@@ -51,7 +51,7 @@ data:
   legacysurvey_data_server_conf.yml: |
     instruments:
       legacysurvey:
-        data_server_url: http://legacysurver-backend:8000
+        data_server_url: http://legacysurvey-backend:8000
         dummy_cache: dangerously-not-set-to-anything-useful
 
   gw_data_server_conf.yml: |
