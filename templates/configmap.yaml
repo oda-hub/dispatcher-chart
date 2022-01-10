@@ -51,11 +51,11 @@ data:
   legacysurvey_data_server_conf.yml: |
     instruments:
       legacysurvey:
-        data_server_url: http://legacysurver-backend:9191
+        data_server_url: http://legacysurver-backend:8000
         dummy_cache: dangerously-not-set-to-anything-useful
 
   gw_data_server_conf.yml: |
     instruments:
       gw:
-        data_server_url: http://gw-backend:9191
+        data_server_url: http://gw-backend:8000
         dummy_cache: dangerously-not-set-to-anything-useful
