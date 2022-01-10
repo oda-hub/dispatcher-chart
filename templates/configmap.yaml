@@ -47,3 +47,15 @@ data:
         data_server_cache:
         dummy_cache: dummy_prods
         data_server_url: {{ .Values.spiacs_data_server_url | default "https://www.astro.unige.ch/cdci/astrooda/dispatch-data/gw/integralhk/api/v1.0/genlc/ACS/{t0_isot}/{dt_s}" }}
+
+  legacysurvey_data_server_conf.yml: |
+    instruments:
+      legacysurvey:
+        data_server_url: http://legacysurver-backend:9191
+        dummy_cache: dangerously-not-set-to-anything-useful
+
+  gw_data_server_conf.yml: |
+    instruments:
+      gw:
+        data_server_url: http://gw-backend:9191
+        dummy_cache: dangerously-not-set-to-anything-useful
