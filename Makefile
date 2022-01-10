@@ -8,4 +8,4 @@ create-secrets:
 	bash make.sh create-secret
 
 update:
-	bash make.sh update $@
+	bash make.sh update master
