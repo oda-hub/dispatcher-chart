@@ -12,6 +12,9 @@ function site-values() {
 function create-secret() {
     kubectl -n $ODA_NAMESPACE delete secret dispatcher-conf || echo ok
     kubectl -n $ODA_NAMESPACE create secret generic dispatcher-conf --from-file=conf_env.yml=conf/conf_env.yml
+    
+    kubectl -n $ODA_NAMESPACE delete secret dispatcher-renku-ssh-key || echo ok
+    kubectl -n $ODA_NAMESPACE create secret generic dispatcher-renku-ssh-key --from-file=renku-ssh-key=conf/renku-ssh-key
 }
 
 function install() {
