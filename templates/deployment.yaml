@@ -30,9 +30,15 @@ spec:
       - name: dispatcher-config-volume 
         configMap:
           name: dispatcher-config
+      - name: dispatcher-users
+        configMap: 
+          name: dispatcher-users
       - name: dispatcher-conf-secret
         secret:
           secretName: dispatcher-conf      
+      - name: dispatcher-renku-ssh-key
+        secret:
+          secretName: dispatcher-renku-ssh-key
       - name: dispatcher-scratch-root
         persistentVolumeClaim:
           claimName: dispatcher-scratch-root
@@ -115,12 +121,20 @@ spec:
             name: dispatcher-conf-secret
             subPath: conf_env.yml
             readOnly: true
+          - mountPath: /etc/renku-ssh-key
+            name: dispatcher-renku-ssh-key
+            subPath: renku-ssh-key
+            readOnly: true
+          - mountPath: /etc/passwd
+            name: dispatcher-users
+            subPath: passwd
+            readOnly: true          
           {{- range $plugin := list "osa" "magic" "polar" "antares" "spiacs" "gw" "legacysurvey" }}
           - name: dispatcher-config-volume
             mountPath: /dispatcher/conf/conf.d/{{$plugin}}_data_server_conf.yml
             subPath: {{$plugin}}_data_server_conf.yml
             readOnly: true
-          {{- end }}  
+          {{- end }} 
 
        {{ if .Values.async_dispatcher }}
         - name: redis
