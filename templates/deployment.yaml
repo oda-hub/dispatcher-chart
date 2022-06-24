@@ -88,6 +88,8 @@ spec:
           env:
           - name: ODA_SPARQL_ROOT
             value: {{ .Values.oda_sparql_root }}
+          - name: DISPATCHER_MOCK_KB
+            value: "yes"
           - name: DISPATCHER_GUNICORN
             {{- if .Values.dispatcher_gunicorn }}
             value: "yes"
