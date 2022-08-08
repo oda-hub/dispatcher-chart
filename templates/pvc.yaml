@@ -27,7 +27,8 @@ spec:
       #- ReadWriteMany
   resources:
     requests:
-      storage: 200Gi
+      storage: 30Gi
+      #storage: 200Gi
 
 ---
 # used additional log location, for occasional inspections

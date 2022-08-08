@@ -9,3 +9,6 @@ create-secrets:
 
 update:
 	bash make.sh update master
+
+cleanup:
+	kubectl -n oda-production exec -it deployment/oda-dispatcher -- find -ctime + 2
