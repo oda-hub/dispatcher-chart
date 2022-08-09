@@ -42,3 +42,20 @@ deploy:
   only:
     - master
     - ci
+
+deploy:
+  image: alpine/helm
+  stage: deploy
+  dependencies: 
+    - build
+  before_script:
+    - apk add git openssh make bash curl
+    - git clone https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.astro.unige.ch/oda/site-config.git
+    - cp -fv site-config/dispatcher/values-unige-dstic-production.yaml .
+  script:
+    - export ODA_NAMESPACE=oda-production
+      #- export ODA_NAMESPACE=oda-staging-$CI_COMMIT_TAG # make review?
+    - export ODA_SITE=unige-dstic-production
+    - bash make.sh upgrade 
+  only:
+    - tags
