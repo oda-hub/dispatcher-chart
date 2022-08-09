@@ -26,7 +26,7 @@ build:
     - ci
 
 
-deploy:
+deploy-staging:
   image: alpine/helm
   stage: deploy
   dependencies: 
@@ -43,7 +43,7 @@ deploy:
     - master
     - ci
 
-deploy:
+deploy-production:
   image: alpine/helm
   stage: deploy
   dependencies: 
