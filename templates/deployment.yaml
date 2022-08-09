@@ -11,8 +11,8 @@ spec:
       app.kubernetes.io/name: {{ include "chart.name" . }}
       app.kubernetes.io/instance: {{ .Release.Name }}
   strategy:
-    type: RollingUpdate
-    #type: Recreate # better RollingUpdate, but needed for once mounted
+      #type: RollingUpdate
+    type: Recreate # better RollingUpdate, but needed for once mounted
   template:
     metadata:
       labels:
