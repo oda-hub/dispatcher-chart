@@ -65,6 +65,9 @@ data:
       lightcurve-example:
         data_server_url: http://lightcurve-example-workflow-backend:8000
         dummy_cache: required-but-not-used
+      cta-example:
+        data_server_url: http://cta-example-workflow-backend:8000
+        dummy_cache: required-but-not-used
 ---
 apiVersion: v1
 kind: ConfigMap
