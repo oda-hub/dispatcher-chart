@@ -8,7 +8,7 @@ stages:
 
 build:
   # Official docker image.
-  retry: 5
+  retry: 2
   image: docker:stable
   stage: build
   variables:
@@ -28,7 +28,7 @@ build:
 
 
 deploy-staging:
-  retry: 5
+  retry: 2
   image: alpine/helm
   stage: deploy
   dependencies: 
@@ -46,7 +46,7 @@ deploy-staging:
     - ci
 
 deploy-production:
-  retry: 5
+  retry: 2
   image: alpine/helm
   stage: deploy
   dependencies: 
