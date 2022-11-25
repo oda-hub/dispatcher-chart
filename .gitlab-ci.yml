@@ -25,6 +25,7 @@ build:
   only:
     - master
     - ci
+    - tags
 
 
 deploy-staging:
