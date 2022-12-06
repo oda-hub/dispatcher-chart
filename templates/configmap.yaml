@@ -96,4 +96,4 @@ data:
     nobody:x:65534:65534:nobody:/nonexistent:/usr/sbin/nologin
     _apt:x:100:65534::/nonexistent:/usr/sbin/nologin
     messagebus:x:101:102::/nonexistent:/usr/sbin/nologin
-    oda:x:{{ .Values.securityContext.runAsUser }}:{{ .Values.securityContext.runAsGroup }}::/tmp/oda:/bin/bash
+    oda:x:{{ .Values.securityContext.runAsUser | int }}:{{ .Values.securityContext.runAsGroup | int }}::/tmp/oda:/bin/bash
