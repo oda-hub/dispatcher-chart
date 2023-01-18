@@ -138,6 +138,53 @@ spec:
             readOnly: true
           {{- end }} 
 
+
+        - name: {{ .Chart.Name }}-scratch-cleaner
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command: ["bash"]
+          args:
+          - "-c"
+          - |
+            set -x
+            while true; do
+              date             
+              df -h /data/dispatcher_scratch
+              find -name query_output\* -ctime +1 -exec rm -fv '{}' \;
+              find -name scratch_sid_\* -ctime +7 -exec rm -rfv '{}' \;
+              find -wholename \*scratch_sid_statuscaketeststatuscaketest_jid\* -amin +60 -exec rm -rfv '{}' \;
+              sleep 10
+            done
+
+          ports: []
+          livenessProbe:
+            exec:
+              command:
+              - df 
+              - -h
+              - /data/dispatcher_scratch
+            failureThreshold: 5
+            initialDelaySeconds: 15
+            periodSeconds: 60
+            timeoutSeconds: 30
+
+          readinessProbe:
+            exec:
+              command:
+              - df 
+              - -h
+              - /data/dispatcher_scratch
+            failureThreshold: 3
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            timeoutSeconds: 10
+          
+          volumeMounts:
+          - mountPath: /data/dispatcher_scratch
+            name: dispatcher-scratch-root
+
        {{ if .Values.async_dispatcher }}
         - name: redis
           securityContext:
