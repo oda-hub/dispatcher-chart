@@ -61,13 +61,15 @@ data:
         dummy_cache: dangerously-not-set-to-anything-useful
 
   nb_data_server_conf.yml: |
-    instruments:
-      lightcurve-example:
-        data_server_url: http://lightcurve-example-workflow-backend:8000
-        dummy_cache: required-but-not-used
-      cta-example:
-        data_server_url: http://cta-example-workflow-backend:8000
-        dummy_cache: required-but-not-used
+    {{- if .Values.nb2w_knowledge_graph }}
+    kg:
+      type: {{ .Values.nb2w_knowledge_graph.type }}
+      path: {{ .Values.nb2w_knowledge_graph.path }}
+    {{- end }}
+    {{- if .Values.nb2w_ontology_path }}
+    ontology_path: {{ .Values.nb2w_ontology_path }}
+    {{- end }}
+    
 ---
 apiVersion: v1
 kind: ConfigMap
