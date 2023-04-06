@@ -109,7 +109,7 @@ spec:
                 name: dda-interface-token
                 key: token.txt
           {{- end }}   
-          {{- range $key, $value := default (dict) Values.extra_env_var }} 
+          {{- range $key, $value := default (dict) .Values.extra_env_var }} 
           - name: {{ $key }}
             value: {{ $value }}
           {{- end }}
