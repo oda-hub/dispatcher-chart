@@ -109,9 +109,9 @@ spec:
                 name: dda-interface-token
                 key: token.txt
           {{- end }}   
-          {{- range $key, $value := default (dict) .Values.extra_env_var }} 
-          - name: {{ $key }}
-            value: {{ $value }}
+          {{- range $idx, $content := default (list) .Values.extra_env_var }} 
+          - name: {{ $content.name }}
+            value: "{{ $content.value }}"
           {{- end }}
           volumeMounts:
           - mountPath: /var/log/containers
