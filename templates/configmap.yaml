@@ -60,16 +60,14 @@ data:
         data_server_url: http://gw-backend:8000
         dummy_cache: dangerously-not-set-to-anything-useful
 
+  {{ if hasKey .Values.plugin_config_override "nb_data_server_conf" }}
   nb_data_server_conf.yml: |
-    {{- if .Values.nb2w_knowledge_graph }}
-    kg:
-      type: {{ .Values.nb2w_knowledge_graph.type }}
-      path: {{ .Values.nb2w_knowledge_graph.path }}
-    {{- end }}
-    {{- if .Values.nb2w_ontology_path }}
-    ontology_path: {{ .Values.nb2w_ontology_path }}
-    {{- end }}
-    
+    {{- toYaml .Values.plugin_config_override.nb_data_server_conf | nindent 4 }}
+  {{ else }}
+  nb_data_server_conf.yml: |4+
+  
+  {{ end }}  
+  
 ---
 apiVersion: v1
 kind: ConfigMap
