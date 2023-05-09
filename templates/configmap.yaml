@@ -60,14 +60,14 @@ data:
         data_server_url: http://gw-backend:8000
         dummy_cache: dangerously-not-set-to-anything-useful
 
+  {{ if hasKey .Values.plugin_config_override "nb_data_server_conf" }}
   nb_data_server_conf.yml: |
-    instruments:
-      lightcurve-example:
-        data_server_url: http://lightcurve-example-workflow-backend:8000
-        dummy_cache: required-but-not-used
-      cta-example:
-        data_server_url: http://cta-example-workflow-backend:8000
-        dummy_cache: required-but-not-used
+    {{- toYaml .Values.plugin_config_override.nb_data_server_conf | nindent 4 }}
+  {{ else }}
+  nb_data_server_conf.yml: |4+
+  
+  {{ end }}  
+  
 ---
 apiVersion: v1
 kind: ConfigMap

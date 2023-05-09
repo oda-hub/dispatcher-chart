@@ -107,3 +107,4 @@ dda:
     # origin: hostpath
     # hostpath: 
 
+plugin_config_override: {}
