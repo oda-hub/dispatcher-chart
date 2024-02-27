@@ -140,13 +140,19 @@ spec:
 
         - name: {{ .Chart.Name }}-job-scanner-staging
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
           command: ["oda_api"]
           args: ["-u", "STAGING_URL", "inspect", "--group-by-job"]
+          - |
+            unset json
+
+            dispatcher_state=$(<dispatcher-state.json)
+
+            jq -c '.["records"][]' <<< "$dispatcher_state" | while IFS= read -r i; do
+              echo "$i" | jq -r 'select(.job_status_data[].request_completed == false) | .job_id' | sort | uniq;
+            done
         
         - name: {{ .Chart.Name }}-job-scanner-production
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
           command: ["oda_api"]
           args: ["-u", "PRODUCTION_URL", "inspect", "--group-by-job"]
 
