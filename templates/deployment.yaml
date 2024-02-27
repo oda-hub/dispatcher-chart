@@ -138,6 +138,19 @@ spec:
             readOnly: true
           {{- end }} 
 
+        - name: {{ .Chart.Name }}-job-scanner-staging
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command: ["oda_api"]
+          args: ["-u", "STAGING_URL", "inspect", "--group-by-job"]
+        
+        - name: {{ .Chart.Name }}-job-scanner-production
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command: ["oda_api"]
+          args: ["-u", "PRODUCTION_URL", "inspect", "--group-by-job"]
+
+
 
         - name: {{ .Chart.Name }}-scratch-cleaner
           securityContext:
