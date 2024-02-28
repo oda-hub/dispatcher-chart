@@ -146,16 +146,33 @@ spec:
             unset json
 
             dispatcher_state=$(<dispatcher-state.json)
+            uncompleted_job_ids=();
 
-            jq -c '.["records"][]' <<< "$dispatcher_state" | while IFS= read -r i; do
-              echo "$i" | jq -r 'select(.job_status_data[].request_completed == false) | .job_id' | sort | uniq;
+            jq -c '.["records"][]' <<< "$json" | while IFS= read -r i; do
+              job_id=`echo "$i" | jq -r '.job_id'`;
+              request_completed=`echo "$i" | jq '.job_status_data[].request_completed'`;
+              if [[ $request_completed != *"true"* ]]; then
+                uncompleted_job_ids+=($job_id);
+              fi
             done
         
         - name: {{ .Chart.Name }}-job-scanner-production
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           command: ["oda_api"]
           args: ["-u", "PRODUCTION_URL", "inspect", "--group-by-job"]
+          - |
+            unset json
 
+            dispatcher_state=$(<dispatcher-state.json)
+            uncompleted_job_ids=();
+
+            jq -c '.["records"][]' <<< "$json" | while IFS= read -r i; do
+              job_id=`echo "$i" | jq -r '.job_id'`;
+              request_completed=`echo "$i" | jq '.job_status_data[].request_completed'`;
+              if [[ $request_completed != *"true"* ]]; then
+                uncompleted_job_ids+=($job_id);
+              fi
+            done
 
 
         - name: {{ .Chart.Name }}-scratch-cleaner
