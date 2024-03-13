@@ -140,18 +140,19 @@ spec:
 
         - name: {{ .Chart.Name }}-job-scanner
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
-          command: ["oda_api"]
-          args: ["-u", "STAGING_URL", "inspect", "--group-by-job"]
+          command: ["bash"]
+          args: 
+          - ["-u", "STAGING_URL", "inspect", "--group-by-job"]
           - |
             uncompleted_job_ids=();
 
-            jq -c '.["records"][]' <<< "$(<dispatcher-state.json)" | while IFS= read -r i; do
+            while IFS= read -r i; do
               job_id=`echo "$i" | jq -r '.job_id'`;
               request_completed=`echo "$i" | jq '.job_status_data[].request_completed'`;
               if [[ $request_completed != *"true"* ]]; then
                 uncompleted_job_ids+=($job_id);
               fi
-            done
+            done < <(jq -c '.["records"][]' <<< "$(<dispatcher-state.json)");
 
         - name: {{ .Chart.Name }}-scratch-cleaner
           securityContext:
