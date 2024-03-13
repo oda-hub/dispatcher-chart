@@ -138,42 +138,20 @@ spec:
             readOnly: true
           {{- end }} 
 
-        - name: {{ .Chart.Name }}-job-scanner-staging
+        - name: {{ .Chart.Name }}-job-scanner
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           command: ["oda_api"]
           args: ["-u", "STAGING_URL", "inspect", "--group-by-job"]
           - |
-            unset json
-
-            dispatcher_state=$(<dispatcher-state.json)
             uncompleted_job_ids=();
 
-            jq -c '.["records"][]' <<< "$json" | while IFS= read -r i; do
+            jq -c '.["records"][]' <<< "$(<dispatcher-state.json)" | while IFS= read -r i; do
               job_id=`echo "$i" | jq -r '.job_id'`;
               request_completed=`echo "$i" | jq '.job_status_data[].request_completed'`;
               if [[ $request_completed != *"true"* ]]; then
                 uncompleted_job_ids+=($job_id);
               fi
             done
-        
-        - name: {{ .Chart.Name }}-job-scanner-production
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
-          command: ["oda_api"]
-          args: ["-u", "PRODUCTION_URL", "inspect", "--group-by-job"]
-          - |
-            unset json
-
-            dispatcher_state=$(<dispatcher-state.json)
-            uncompleted_job_ids=();
-
-            jq -c '.["records"][]' <<< "$json" | while IFS= read -r i; do
-              job_id=`echo "$i" | jq -r '.job_id'`;
-              request_completed=`echo "$i" | jq '.job_status_data[].request_completed'`;
-              if [[ $request_completed != *"true"* ]]; then
-                uncompleted_job_ids+=($job_id);
-              fi
-            done
-
 
         - name: {{ .Chart.Name }}-scratch-cleaner
           securityContext:
