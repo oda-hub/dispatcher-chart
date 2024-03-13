@@ -142,7 +142,7 @@ spec:
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           command: ["bash"]
           args: 
-          - ["-u", "STAGING_URL", "inspect", "--group-by-job"]
+          - ["oda-api", "-u", "DISPATCHER_URL", "inspect", "--group-by-job"]
           - |
             uncompleted_job_ids=();
 
