@@ -144,6 +144,25 @@ spec:
             subPath: {{$plugin}}_data_server_conf.yml
             readOnly: true
           {{- end }} 
+        
+        
+        - name: {{ .Chart.Name }}-postgresql
+          image: "{{ .Values.postgres-image.repository }}:{{ .Values.postgres-image.tag }}"
+          imagePullPolicy: {{ .Values.postgres-image.pullPolicy }}
+            env:
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: dispatcher-postgresql
+                  key: postgres-user
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: dispatcher-postgresql
+                  key: postgres-password
+            volumeMounts:
+            - name: postgres-data
+              mountPath: /var/lib/postgresql/data
 
 
         - name: {{ .Chart.Name }}-scratch-cleaner
@@ -288,7 +307,7 @@ spec:
 
           resources:
             {{- toYaml .Values.resources.celery_flower | nindent 12 }}
-
+        
 
       {{- end }}
       {{- with .Values.nodeSelector }}

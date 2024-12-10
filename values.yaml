@@ -15,6 +15,11 @@ image:
   tag: latest
   pullPolicy: IfNotPresent
 
+postgres-image:
+  repository: odahub/dispatcher-postgres
+  tag: latest
+  pullPolicy: IfNotPresent
+
 imagePullSecrets: []
 nameOverride: ""
 fullnameOverride: ""
