@@ -45,7 +45,7 @@ data:
       spi_acs:
         dispatcher_mnt_point:
         data_server_cache:
-        dummy_cache: dummy_prods
+        dummy_cache: /data/dummy_prods
         data_server_url: {{ .Values.spiacs_data_server_url | default "https://www.astro.unige.ch/cdci/astrooda/dispatch-data/gw/integralhk/api/v1.0/genlc/ACS/{t0_isot}/{dt_s}" }}
 
   legacysurvey_data_server_conf.yml: |
