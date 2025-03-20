@@ -145,6 +145,32 @@ spec:
             readOnly: true
           {{- end }} 
 
+        - name: {{ .Chart.Name }}-job-scanner
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          command: ["bash"]
+          args: 
+          - |
+            oda-api -u DISPATCHER_URL inspect --group-by-job;
+            uncompleted_job_infos=();
+
+            while IFS= read -r i; do
+              job_id=`echo "$i" | jq -r '.job_id'`;
+              request_completed=`echo "$i" | jq '.job_status_data[].request_completed'`;
+              if [[ $request_completed != *"true"* ]]; then
+                analysis_parameters=`echo "$i" | jq '.job_status_data[].scratch_dir_content.analysis_parameters | select(type != "string")'`;
+                instrument=`echo "${analysis_parameters}" | jq '.instrument' | sort -u`;
+                product_type=`echo "${analysis_parameters}" | jq '.product_type' | sort -u`;
+                if [[ -z ${instrument} || -z ${product_type} ]]; then
+                  echo "Either instrument or product_type could not be found for job_id ${job_id}. Skipping..."
+                  continue;
+                fi
+                uncompleted_job_infos+=($job_id $instrument $product_type);
+              fi
+            done < <(jq -c '.["records"][]' <<< "$(<dispatcher-state.json)");
+
+            for i in "${uncompleted_job_infos[@]}"; do
+              oda-api -u DISPATCHER_URL get -i ${i[1]} -p ${i[2]} -a "job_id=${i[0]}" -a "query_status=ready" -a "query_type=Real";
+            done
 
         - name: {{ .Chart.Name }}-scratch-cleaner
           securityContext:
