@@ -116,5 +116,23 @@ dda:
     # origin: mount_pvc
     # origin: hostpath
     # hostpath: 
-
+    
+usageMonitor:
+  enabled: false
+  
+  image:
+    repository: "ghcr.io/alexgugnin/oda-usage-monitor"
+    tag: "latest"
+  
+  scratchDir: "/data/dispatcher_scratch"
+  
+  db:
+    host: "mysql"
+    user: "stats_bot"
+    name: "mmoda_usage"
+    password: ""
+    existingSecret:
+      name: ""
+      key: "db-password"
+      
 plugin_config_override: {}

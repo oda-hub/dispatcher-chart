@@ -145,7 +145,60 @@ spec:
           - mountPath: /data
             name: dispatcher-scratch-root
         {{- end }}
+        
+        {{- if .Values.usageMonitor.enabled }}
+        - name: usage-monitor
+          image: "{{ .Values.usageMonitor.image.repository | default "ghcr.io/alexgugnin/oda-usage-monitor" }}:{{ .Values.usageMonitor.image.tag | default "latest" }}"
+          restartPolicy: Always
+          env:
+            - name: SCRATCH_DIR
+              value: {{ .Values.usageMonitor.scratchDir | default "/data/dispatcher_scratch" | quote }}
+            - name: DB_HOST
+              value: {{ .Values.usageMonitor.db.host | default "mysql" | quote }}
+            - name: DB_USER
+              value: {{ .Values.usageMonitor.db.user | default "stats_bot" | quote }}
+            - name: DB_NAME
+              value: {{ .Values.usageMonitor.db.name | default "mmoda_usage" | quote }}
+            
+            {{- if and .Values.usageMonitor.db.existingSecret .Values.usageMonitor.db.existingSecret.name }}
+            - name: DB_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.usageMonitor.db.existingSecret.name | quote }}
+                  key: {{ .Values.usageMonitor.db.existingSecret.key | default "db-password" | quote }}
+            {{- else if .Values.usageMonitor.db.password }}
+            - name: DB_PASS
+              value: {{ .Values.usageMonitor.db.password | quote }}
+            {{- end }}
+          
+          ports: []
+          livenessProbe:
+            exec:
+              command:
+              - df 
+              - -h
+              - /data/dispatcher_scratch
+            failureThreshold: 5
+            initialDelaySeconds: 15
+            periodSeconds: 60
+            timeoutSeconds: 30
 
+          readinessProbe:
+            exec:
+              command:
+              - df 
+              - -h
+              - /data/dispatcher_scratch
+            failureThreshold: 3
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            timeoutSeconds: 10
+            
+          volumeMounts:
+            - name: dispatcher-scratch-root 
+              mountPath: {{ .Values.usageMonitor.scratchDir | default "/data/dispatcher_scratch" | quote }}
+              readOnly: true
+        {{- end }}
       containers:
         - name: {{ .Chart.Name }}
           securityContext:
