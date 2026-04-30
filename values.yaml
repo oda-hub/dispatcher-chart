@@ -123,6 +123,7 @@ usageMonitor:
   image:
     repository: "ghcr.io/alexgugnin/oda-usage-monitor"
     tag: "latest"
+    pullPolicy: IfNotPresent
   
   scratchDir: "/data/dispatcher_scratch"
   

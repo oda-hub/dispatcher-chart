@@ -149,6 +149,7 @@ spec:
         {{- if .Values.usageMonitor.enabled }}
         - name: usage-monitor
           image: "{{ .Values.usageMonitor.image.repository | default "ghcr.io/alexgugnin/oda-usage-monitor" }}:{{ .Values.usageMonitor.image.tag | default "latest" }}"
+          imagePullPolicy: {{ .Values.usageMonitor.image.pullPolicy | default "IfNotPresent" }}
           restartPolicy: Always
           env:
             - name: SCRATCH_DIR
